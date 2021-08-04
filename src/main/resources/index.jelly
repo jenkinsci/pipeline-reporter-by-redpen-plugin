@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+    The plugin will add a comment with log file as an attachment to the Jira issue.
+</div>

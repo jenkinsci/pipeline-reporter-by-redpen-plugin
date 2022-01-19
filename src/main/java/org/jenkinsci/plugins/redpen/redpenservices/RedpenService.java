@@ -7,8 +7,10 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.jenkinsci.plugins.redpen.httpclient.HttpClientProvider;
 import org.jenkinsci.plugins.redpen.models.CommentRequestModel;
+import org.jenkinsci.plugins.redpen.models.WidgetModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,5 +76,29 @@ public class RedpenService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Response getJWT(String widgetId) {
+
+        ObjectMapper mapper = new ObjectMapper();
+        MediaType json = MediaType.parse("application/json");
+
+        try {
+            WidgetModel widgetModel = new WidgetModel();
+            widgetModel.setWidgetId(widgetId);
+
+            String bodyString = mapper.writeValueAsString(widgetModel);
+            RequestBody body = RequestBody.create(json, bodyString);
+            Request request = new Request.Builder()
+                    .url(String.format("%s/widget/authentication", BASE_PATH))
+                    .method("GET", body)
+                    .build();
+
+            return this.httpClient.newCall(request)
+                    .execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

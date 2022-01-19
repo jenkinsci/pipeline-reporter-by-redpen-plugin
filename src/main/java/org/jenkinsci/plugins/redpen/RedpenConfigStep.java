@@ -9,6 +9,7 @@ import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import okhttp3.Response;
 import org.jenkinsci.plugins.redpen.ghpr.GithubPrHelper;
 import org.jenkinsci.plugins.redpen.jwt.JWTUtility;
 import org.jenkinsci.plugins.redpen.redpenservices.RedpenService;
@@ -43,28 +44,29 @@ public class RedpenConfigStep extends Recorder {
 
         // If the build status is not SUCCESS then
         // call the redpen and add comment with log file as an attachment in the issue.
-        if (result != null && result.isWorseThan(Result.SUCCESS)) {
+//        if (result != null && result.isWorseThan(Result.SUCCESS)) {
             GithubPrHelper githubPrHelper = new GithubPrHelper();
             String issueKey = githubPrHelper.getIssueKeyFromPR(build);
 
-            SecretRetriever secretRetriever = new SecretRetriever();
-            Optional<String> mayBeKey = secretRetriever.getSecretFor("PRIVATE_KEY_CONTENT");
 
-            if (mayBeKey.isPresent()) {
+//            SecretRetriever secretRetriever = new SecretRetriever();
+            RedpenService redpenService = RedpenService.getRedpenInstance();
+        Response jwt = redpenService.getJWT("29dce7bc-da7a-429d-b1e4-8e8cf69acac7");
+//            Optional<String> mayBeKey = secretRetriever.getSecretFor("PRIVATE_KEY_CONTENT");
+
                 String token = null;
                 try {
-                    token = JWTUtility.getJWTToken(mayBeKey.get(), userServiceConnectionId);
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                    token = jwt.message();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-                RedpenService redpenService = RedpenService.getRedpenInstance();
                 redpenService.addAttachment(build, issueKey, token);
                 redpenService.addComment(build, issueKey, token);
                 return true;
-            }
+//            }
 
-        }
-        return true;
+//        }
+//        return true;
     }
 
     @Extension

@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.redpen;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Launcher;
@@ -10,18 +9,12 @@ import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
-//import okhttp3.Response;
 import org.jenkinsci.plugins.redpen.ghpr.GithubPrHelper;
-import org.jenkinsci.plugins.redpen.jwt.JWTUtility;
 import org.jenkinsci.plugins.redpen.redpenservices.RedpenService;
-import org.jenkinsci.plugins.redpen.secrets.SecretRetriever;
 import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Optional;
 
 public class RedpenConfigStep extends Recorder {
     private String userServiceConnectionId;
@@ -42,19 +35,17 @@ public class RedpenConfigStep extends Recorder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
-//        Result result = build.getResult();
+        Result result = build.getResult();
 
         // If the build status is not SUCCESS then
         // call the redpen and add comment with log file as an attachment in the issue.
-//        if (result != null && result.isWorseThan(Result.SUCCESS)) {
+        if (result != null && result.isWorseThan(Result.SUCCESS)) {
             GithubPrHelper githubPrHelper = new GithubPrHelper();
             String issueKey = githubPrHelper.getIssueKeyFromPR(build);
             String widgetId = "1e26a6e0-a7df-4e24-bee0-476ae1181ef6";
 
-//            SecretRetriever secretRetriever = new SecretRetriever();
             RedpenService redpenService = RedpenService.getRedpenInstance();
         String jwt = redpenService.getJWT(widgetId);
-//            Optional<String> mayBeKey = secretRetriever.getSecretFor("PRIVATE_KEY_CONTENT");
 
                 String token = null;
                 try {
@@ -67,10 +58,8 @@ public class RedpenConfigStep extends Recorder {
                 redpenService.addAttachment(build,widgetId, issueKey, token);
 //                redpenService.addComment(build, issueKey, token);
                 return true;
-//            }
-
-//        }
-//        return true;
+            }
+        return true;
     }
 
     @Extension

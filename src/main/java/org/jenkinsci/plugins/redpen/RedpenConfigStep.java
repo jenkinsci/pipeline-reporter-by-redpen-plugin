@@ -17,19 +17,19 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import java.io.IOException;
 
 public class RedpenConfigStep extends Recorder {
-    private String userServiceConnectionId;
+    private String redpenWidgetId;
 
     @DataBoundConstructor
-    public RedpenConfigStep(String userServiceConnectionId) {
-        this.userServiceConnectionId = userServiceConnectionId;
+    public RedpenConfigStep(String redpenWidgetId) {
+        this.redpenWidgetId = redpenWidgetId;
     }
 
-    public String getUserServiceConnectionId() {
-        return userServiceConnectionId;
+    public String getRedpenWidgetId() {
+        return redpenWidgetId;
     }
 
-    public void setUserServiceConnectionId(String userServiceConnectionId) {
-        this.userServiceConnectionId = userServiceConnectionId;
+    public void setRedpenWidgetId(String redpenWidgetId) {
+        this.redpenWidgetId = redpenWidgetId;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class RedpenConfigStep extends Recorder {
         if (result != null && result.isWorseThan(Result.SUCCESS)) {
             GithubPrHelper githubPrHelper = new GithubPrHelper();
             String issueKey = githubPrHelper.getIssueKeyFromPR(build);
-            String widgetId = "1e26a6e0-a7df-4e24-bee0-476ae1181ef6";
+            String widgetId = this.redpenWidgetId;
 
             RedpenService redpenService = RedpenService.getRedpenInstance();
         String jwt = redpenService.getJWT(widgetId);
@@ -78,7 +78,7 @@ public class RedpenConfigStep extends Recorder {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Redpen user service connection id";
+            return "Redpen Widget id";
         }
     }
 }

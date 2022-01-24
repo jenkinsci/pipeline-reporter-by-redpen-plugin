@@ -66,11 +66,6 @@ public class RedpenConfigStep extends Recorder {
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
         @Override
-        public String getDescriptorUrl() {
-            return super.getDescriptorUrl();
-        }
-
-        @Override
         public boolean isApplicable(Class aClass) {
             return true;
         }

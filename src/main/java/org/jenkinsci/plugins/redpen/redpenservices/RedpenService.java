@@ -22,7 +22,7 @@ public class RedpenService {
 
     private static RedpenService instance;
     private final CloseableHttpClient httpClient;
-    private static final String BASE_PATH = "http://localhost:8081";
+    private static final String BASE_PATH = "http://localhost:8082";
 
     private RedpenService() {
         this.httpClient = HttpClients.createDefault();
@@ -35,18 +35,17 @@ public class RedpenService {
         return instance;
     }
 
-    public void addAttachment(AbstractBuild<?, ?> build, String widgetId, String issueKey, String token) throws IOException {
+    public void addAttachment(AbstractBuild<?, ?> build, String issueKey, String token) throws IOException {
 
 
         File file = new File(build.getLogFile().getAbsolutePath());
-        HttpPost post = new HttpPost(String.format("%s/external/widgets/%s/issues/%s/attachments", BASE_PATH, widgetId, issueKey));
+        HttpPost post = new HttpPost(String.format("%s/external/jenkins/issues/%s/attachments", BASE_PATH, issueKey));
         FileBody fileBody = new FileBody(file, ContentType.DEFAULT_BINARY);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
         builder.addPart("file", fileBody);
         HttpEntity entity = builder.build();
 
-        post.addHeader("Access-Control-Allow-Origin", "https://www.xbox.com");
         post.addHeader("Authorization", "JWT " + token);
         post.setEntity(entity);
          this.httpClient.execute(post);

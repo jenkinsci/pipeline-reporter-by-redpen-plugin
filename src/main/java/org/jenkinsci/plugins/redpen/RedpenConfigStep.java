@@ -10,31 +10,34 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import org.jenkinsci.plugins.redpen.ghpr.GithubPrHelper;
+import org.jenkinsci.plugins.redpen.jwt.JWTUtility;
 import org.jenkinsci.plugins.redpen.redpenservices.RedpenService;
-import org.json.JSONObject;
+import org.jenkinsci.plugins.redpen.secrets.SecretRetriever;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Optional;
 
 public class RedpenConfigStep extends Recorder {
-    private String redpenWidgetId;
+    private String serviceConnectionId;
 
     @DataBoundConstructor
-    public RedpenConfigStep(String redpenWidgetId) {
-        this.redpenWidgetId = redpenWidgetId;
+    public RedpenConfigStep(String serviceConnectionId) {
+        this.serviceConnectionId = serviceConnectionId;
     }
 
-    public String getRedpenWidgetId() {
-        return redpenWidgetId;
+    public String getServiceConnectionId() {
+        return serviceConnectionId;
     }
 
-    public void setRedpenWidgetId(String redpenWidgetId) {
-        this.redpenWidgetId = redpenWidgetId;
+    public void setServiceConnectionId(String serviceConnectionId) {
+        this.serviceConnectionId = serviceConnectionId;
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-                           BuildListener listener) throws InterruptedException, IOException {
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         Result result = build.getResult();
 
         // If the build status is not SUCCESS then
@@ -42,23 +45,20 @@ public class RedpenConfigStep extends Recorder {
         if (result != null && result.isWorseThan(Result.SUCCESS)) {
             GithubPrHelper githubPrHelper = new GithubPrHelper();
             String issueKey = githubPrHelper.getIssueKeyFromPR(build);
-            String widgetId = this.redpenWidgetId;
+            SecretRetriever secretRetriever = new SecretRetriever();
+            Optional<String> mayBeKey = secretRetriever.getSecretFor("PRIVATE_KEY_CONTENT");
 
             RedpenService redpenService = RedpenService.getRedpenInstance();
-        String jwt = redpenService.getJWT(widgetId);
-
-                String token = null;
+            if (mayBeKey.isPresent()) {
                 try {
-                    JSONObject json = new JSONObject(jwt);
-
-                    token = json.getString("jwt");
-                } catch (Exception e) {
+                    String jwtToken = JWTUtility.getJWTToken(mayBeKey.get(), this.serviceConnectionId);
+                    redpenService.addAttachment(build, issueKey, jwtToken);
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                     e.printStackTrace();
                 }
-                redpenService.addAttachment(build,widgetId, issueKey, token);
-//                redpenService.addComment(build, issueKey, token);
-                return true;
             }
+            return true;
+        }
         return true;
     }
 

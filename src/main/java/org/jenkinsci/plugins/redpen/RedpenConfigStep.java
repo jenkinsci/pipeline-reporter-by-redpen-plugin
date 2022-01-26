@@ -73,7 +73,7 @@ public class RedpenConfigStep extends Recorder {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Redpen Widget id";
+            return "Redpen ServiceConnectionId";
         }
     }
 }

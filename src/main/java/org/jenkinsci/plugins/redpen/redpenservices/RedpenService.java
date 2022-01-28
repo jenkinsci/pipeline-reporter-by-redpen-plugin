@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.redpen.redpenservices;
 
 import hudson.model.AbstractBuild;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,12 +36,18 @@ public class RedpenService {
         return instance;
     }
 
+    private String getNewFile(AbstractBuild<?, ?> build, String path) {
+        return path + "_" + build.getDisplayName() + "_" + build.getResult();
+    }
+
     public CloseableHttpResponse addAttachment(AbstractBuild<?, ?> build, String issueKey, String token, String path)
             throws IOException {
 
         File file = new File(path);
+        File file2 = new File(getNewFile(build, path));
+        FileUtils.copyFile(file, file2);
         HttpPost post = new HttpPost(String.format("%s/external/jenkins/issues/%s/attachments", BASE_PATH, issueKey));
-        FileBody fileBody = new FileBody(file, ContentType.DEFAULT_BINARY);
+        FileBody fileBody = new FileBody(file2, ContentType.DEFAULT_BINARY);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
         builder.addPart("file", fileBody);
@@ -56,9 +63,19 @@ public class RedpenService {
 
         try {
 
-            HttpPost request = new HttpPost(String.format("%s/external/jenkins/issues/%s/comment?comment=%s", BASE_PATH,
-                    issueKey, String.format("Build %s", build.getDisplayName())));
+            String comment = String.format("Build %s", build.getDisplayName());
+            StringBuilder json = new StringBuilder();
+
+            json.append("{ \"comment\": \"").append("[^").append(getNewFile(build, build.getLogFile().getName()))
+                    .append("] ").append(comment).append("\" }");
+
+            HttpPost request = new HttpPost(String.format("%s/external/jenkins/issues/%s/comment", BASE_PATH,
+                    issueKey));
             request.addHeader("Authorization", "JWT " + token);
+            request.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+            StringEntity stringEntity = new StringEntity(json.toString());
+            request.setEntity(stringEntity);
 
             try (CloseableHttpResponse response = this.httpClient.execute(request)) {
 

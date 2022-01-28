@@ -54,11 +54,6 @@ public class RedpenConfigStep extends Recorder {
                 try {
                     String jwtToken = JWTUtility.getJWTToken(mayBeKey.get(), this.serviceConnectionId);
                     redpenService.addAttachment(build, issueKey, jwtToken, build.getLogFile().getAbsolutePath());
-                    redpenService.addAttachment(build, issueKey, jwtToken,
-                            "work/workspace/Jenkins Test Project React/logs/tmpDir/React App - Home Screen/should have data of customer/screenshot_1.png");
-                    redpenService.addAttachment(build, issueKey, jwtToken,
-                            "work/workspace/Jenkins Test Project React/logs/tmpDir/React App - Home Screen/should have data of customer/screenshot_1.png");
-                    redpenService.addComment(build, issueKey, jwtToken);
                     redpenService.addComment(build, issueKey, jwtToken);
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                     e.printStackTrace();

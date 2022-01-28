@@ -22,7 +22,7 @@ public class RedpenService {
 
     private static RedpenService instance;
     private final CloseableHttpClient httpClient;
-    private static final String BASE_PATH = "http://localhost:8082";
+    private static final String BASE_PATH = "http://localhost:8081";
 
     private RedpenService() {
         this.httpClient = HttpClients.createDefault();
@@ -35,10 +35,10 @@ public class RedpenService {
         return instance;
     }
 
-    public void addAttachment(AbstractBuild<?, ?> build, String issueKey, String token) throws IOException {
+    public CloseableHttpResponse addAttachment(AbstractBuild<?, ?> build, String issueKey, String token, String path)
+            throws IOException {
 
-
-        File file = new File(build.getLogFile().getAbsolutePath());
+        File file = new File(path);
         HttpPost post = new HttpPost(String.format("%s/external/jenkins/issues/%s/attachments", BASE_PATH, issueKey));
         FileBody fileBody = new FileBody(file, ContentType.DEFAULT_BINARY);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -48,25 +48,17 @@ public class RedpenService {
 
         post.addHeader("Authorization", "JWT " + token);
         post.setEntity(entity);
-         this.httpClient.execute(post);
+
+        return this.httpClient.execute(post);
     }
 
     public void addComment(AbstractBuild<?, ?> build, String issueKey, String token) {
-        String logFileName = build.getLogFile()
-                .getName();
-        String comment = String.format("Log file for the failed build is [^%s] ", logFileName);
 
         try {
 
-            HttpPost request = new HttpPost(String.format("%s/external/widgets/issues/%s/comments", BASE_PATH, issueKey));
-            request.addHeader("Authorization","JWT " + token );
-            StringBuilder json = new StringBuilder();
-
-            json.append("{");
-            json.append("\"comment\":\""+comment+"\",");
-            json.append("}");
-
-            request.setEntity(new StringEntity(json.toString()));
+            HttpPost request = new HttpPost(String.format("%s/external/jenkins/issues/%s/comment?comment=%s", BASE_PATH,
+                    issueKey, String.format("Build %s", build.getDisplayName())));
+            request.addHeader("Authorization", "JWT " + token);
 
             try (CloseableHttpResponse response = this.httpClient.execute(request)) {
 
@@ -85,7 +77,7 @@ public class RedpenService {
 
             StringBuilder json = new StringBuilder();
 
-            json.append("{ \"widgetId\": \""+widgetId+"\" }");
+            json.append("{ \"widgetId\": \"" + widgetId + "\" }");
 
             request.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             request.addHeader("site-origin", "https://www.xbox.com");

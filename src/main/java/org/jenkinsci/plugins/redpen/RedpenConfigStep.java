@@ -70,9 +70,9 @@ public class RedpenConfigStep extends Recorder {
 
                     String currentDir = System.getProperty("user.dir");
 
-                    String filePathLog = currentDir + "/work/workspace/" + build.getProject().getName() + "/src/e2e/logs";
-                    String filePathReport = currentDir + "/work/workspace/" + build.getProject().getName() + "/src/e2e/reports/master-report.pdf";
-                    String commentString = String.format("Build %s Result %s", build.getDisplayName(), build.getResult());
+                    String filePathLog = String.format("%s/work/workspace/%s/logs", currentDir, build.getProject().getName());
+                    String filePathReport = String.format("%s/work/workspace/%s/reports/master-report.pdf", currentDir, build.getProject().getName());
+                    String commentString = String.format("Build [%s] Result {color:red}*%s*{color}", build.getProject().getAbsoluteUrl() + build.getSearchUrl(), build.getResult());
                     List<String> logFiles = attachLogFiles(build, filePathLog, issueKey, jwtToken);
                     List<String> reportFiles = attachLogFiles(build, filePathReport, issueKey, jwtToken);
 

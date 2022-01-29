@@ -67,29 +67,27 @@ public class RedpenConfigStep extends Recorder {
                     FileUtils.copyFile(file, file2);
 
                     redpenService.addAttachment(build, issueKey, jwtToken, file2);
-                    redpenService.addComment(build, issueKey, jwtToken);
 
-                    String filePath = "/home/ayush/Documents/RedpenWorkspace/Jankins/redpen-jenkins-integration/work/workspace/Jenkins Test Project React/src/e2e/logs";
+                    String currentDir = System.getProperty("user.dir");
 
-                    File e2eLogs = new File(filePath);
+                    String filePathLog = currentDir + "/work/workspace/" + build.getProject().getName() + "/src/e2e/logs";
+                    String filePathReport = currentDir + "/work/workspace/" + build.getProject().getName() + "/src/e2e/reports/master-report.pdf";
+                    String commentString = String.format("Build %s Result %s", build.getDisplayName(), build.getResult());
+                    List<String> logFiles = attachLogFiles(build, filePathLog, issueKey, jwtToken);
+                    List<String> reportFiles = attachLogFiles(build, filePathReport, issueKey, jwtToken);
 
-                    List<File> files = listFilesForFolder(e2eLogs);
-                    for (File file1 : files) {
-                        String absolutePath = file1.getAbsolutePath();
+                    List<String> allFiles = new ArrayList<>();
+                    allFiles.addAll(logFiles);
+                    allFiles.addAll(reportFiles);
+                    allFiles.add(redpenService.getNewFile(build, build.getLogFile().getName()));
 
-                        Path filePathAbsolute = Paths.get(absolutePath);
-                        BasicFileAttributes attr = Files.readAttributes(filePathAbsolute, BasicFileAttributes.class);
-                        FileTime fileTime = attr.creationTime();
-
-                        FileTime from = FileTime.from(build.getTime().toInstant());
-
-                        int after = from.compareTo(fileTime);
-
-                        if (after == 1) {
-                            redpenService.addAttachment(build, issueKey, jwtToken, file1);
-                        }
+                    StringBuilder comment = new StringBuilder();
+                    for (String fileName: allFiles) {
+                        comment.append(String.format("[^%s]", fileName));
                     }
+                    comment.append(commentString);
 
+                    redpenService.addComment(build, issueKey, jwtToken, comment.toString());
                     return true;
 
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -99,6 +97,31 @@ public class RedpenConfigStep extends Recorder {
             return true;
         }
         return true;
+    }
+
+    private List<String> attachLogFiles(AbstractBuild<?, ?> build, String filePath, String issueKey, String jwtToken) throws IOException {
+        File e2eLogs = new File(filePath);
+        RedpenService redpenService = RedpenService.getRedpenInstance();
+        List<String> fileNames = new ArrayList<>();
+
+        List<File> files = listFilesForFolder(e2eLogs);
+        for (File file1 : files) {
+            String absolutePath = file1.getAbsolutePath();
+
+            Path filePathAbsolute = Paths.get(absolutePath);
+            BasicFileAttributes attr = Files.readAttributes(filePathAbsolute, BasicFileAttributes.class);
+            FileTime fileTime = attr.creationTime();
+
+            FileTime from = FileTime.from(build.getTime().toInstant());
+
+            int after = from.compareTo(fileTime);
+
+            if (after > 0) {
+                redpenService.addAttachment(build, issueKey, jwtToken, file1);
+                fileNames.add(file1.getName());
+            }
+        }
+        return fileNames;
     }
 
     public List<File> listFilesForFolder(File folder) {
@@ -114,6 +137,10 @@ public class RedpenConfigStep extends Recorder {
                 }
             }
         }
+        if (folder.exists() && !folder.isDirectory()) {
+            files.add(folder);
+        }
+
         return files;
     }
 

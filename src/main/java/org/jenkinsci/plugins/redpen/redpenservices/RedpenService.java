@@ -62,12 +62,11 @@ public class RedpenService {
         }
     }
 
-    public void addComment(AbstractBuild<?, ?> build, String issueKey, String token) {
+    public void addComment(AbstractBuild<?, ?> build, String issueKey, String token, String comment) {
 
         try {
-            String logFileName = getNewFile(build, build.getLogFile().getName());
-            String comment = String.format("Build %s Result %s", build.getDisplayName(), build.getResult());
-            String commentBody = String.format("{ \"comment\": \"[^%s] %s\" }", logFileName, comment);
+
+            String commentBody = String.format("{ \"comment\": \"%s\" }", comment);
 
             HttpPost request = new HttpPost(
                     String.format("%s/external/jenkins/issues/%s/comment", BASE_PATH, issueKey));

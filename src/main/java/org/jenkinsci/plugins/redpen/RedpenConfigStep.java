@@ -91,13 +91,10 @@ public class RedpenConfigStep extends Recorder {
                     comment.append(commentString);
 
                     redpenService.addComment(build, issueKey, jwtToken, comment.toString());
-                    return true;
-
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                     e.printStackTrace();
                 }
             }
-            return true;
         }
         return true;
     }
@@ -119,7 +116,7 @@ public class RedpenConfigStep extends Recorder {
 
             int after = from.compareTo(fileTime);
 
-            if (after > 0) {
+            if (after < 0) {
                 redpenService.addAttachment(build, issueKey, jwtToken, file1);
                 fileNames.add(file1.getName());
             }

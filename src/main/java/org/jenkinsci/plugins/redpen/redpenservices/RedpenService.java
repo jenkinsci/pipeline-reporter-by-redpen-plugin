@@ -82,29 +82,4 @@ public class RedpenService {
             e.printStackTrace();
         }
     }
-
-    public String getJWT(String widgetId) {
-
-        try {
-
-            HttpPost request = new HttpPost(String.format("%s/widget/authentication", BASE_PATH));
-
-            StringBuilder json = new StringBuilder();
-
-            json.append("{ \"widgetId\": \"" + widgetId + "\" }");
-
-            request.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            request.addHeader("site-origin", "https://www.xbox.com");
-            StringEntity stringEntity = new StringEntity(json.toString());
-            request.setEntity(stringEntity);
-
-            try (CloseableHttpResponse response = this.httpClient.execute(request)) {
-
-                return EntityUtils.toString(response.getEntity());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

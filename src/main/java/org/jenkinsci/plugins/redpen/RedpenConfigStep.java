@@ -62,15 +62,18 @@ public class RedpenConfigStep extends Recorder {
             if (mayBeKey.isPresent()) {
                 try {
                     String jwtToken = JWTUtility.getJWTToken(mayBeKey.get(), this.serviceConnectionId);
+                    // build log's absolute file path
                     File file = new File(build.getLogFile().getAbsolutePath());
+                    // create new file from build log's to log_<buildId>_<status>
                     File file2 = new File(redpenService.getNewFile(build, build.getLogFile().getAbsolutePath()));
                     FileUtils.copyFile(file, file2);
 
                     redpenService.addAttachment(build, issueKey, jwtToken, file2);
 
                     String currentDir = System.getProperty("user.dir");
-
+                    // logs file path
                     String filePathLog = String.format("%s/work/workspace/%s/logs", currentDir, build.getProject().getName());
+                    // reports file path
                     String filePathReport = String.format("%s/work/workspace/%s/reports/master-report.pdf", currentDir, build.getProject().getName());
                     String commentString = String.format("Build [%s] Result {color:red}*%s*{color}", build.getProject().getAbsoluteUrl() + build.getSearchUrl(), build.getResult());
                     List<String> logFiles = attachLogFiles(build, filePathLog, issueKey, jwtToken);

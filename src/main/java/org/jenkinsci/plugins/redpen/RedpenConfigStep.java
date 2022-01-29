@@ -70,12 +70,13 @@ public class RedpenConfigStep extends Recorder {
 
                     redpenService.addAttachment(build, issueKey, jwtToken, file2);
 
-                    String currentDir = System.getProperty("user.dir");
+                    String currentDir = System.getenv().get("JENKINS_HOME");
                     // logs file path
-                    String filePathLog = String.format("%s/work/workspace/%s/logs", currentDir, build.getProject().getName());
+                    String filePathLog = String.format("%s/workspace/%s/logs", currentDir, build.getProject().getName());
                     // reports file path
-                    String filePathReport = String.format("%s/work/workspace/%s/reports/master-report.pdf", currentDir, build.getProject().getName());
-                    String commentString = String.format("Build [%s] Result {color:red}*%s*{color}", build.getProject().getAbsoluteUrl() + build.getSearchUrl(), build.getResult());
+                    String filePathReport = String.format("%s/workspace/%s/reports/master-report.pdf", currentDir, build.getProject().getName());
+                    String commentString = String.format("Build %s Result {color:red}*%s*{color}", build.getDisplayName(), build.getResult());
+
                     List<String> logFiles = attachLogFiles(build, filePathLog, issueKey, jwtToken);
                     List<String> reportFiles = attachLogFiles(build, filePathReport, issueKey, jwtToken);
 

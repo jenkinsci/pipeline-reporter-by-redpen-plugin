@@ -1,76 +1,83 @@
 package org.jenkinsci.plugins.redpen.redpenservices;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.model.AbstractBuild;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import org.jenkinsci.plugins.redpen.httpclient.HttpClientProvider;
-import org.jenkinsci.plugins.redpen.models.CommentRequestModel;
+import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.springframework.http.MediaType;
 
 import java.io.File;
 import java.io.IOException;
 
 public class RedpenService {
 
-    private static RedpenService INSTANCE;
-    private final OkHttpClient httpClient;
-    private static final String BASE_PATH = "https://api.beta.redpen.work";
+    private static RedpenService instance;
+    private final CloseableHttpClient httpClient;
+    private static final String BASE_PATH = "https://api.dev.redpen.work";
 
     private RedpenService() {
-        final HttpClientProvider httpClientProvider = new HttpClientProvider();
-        this.httpClient = httpClientProvider.httpClient();
+        this.httpClient = HttpClients.createDefault();
     }
 
     public static RedpenService getRedpenInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new RedpenService();
+        if (instance == null) {
+            instance = new RedpenService();
         }
-        return INSTANCE;
+        return instance;
     }
 
-    public void addAttachment(AbstractBuild<?, ?> build, String issueKey, String token) throws IOException {
-        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("file", build.getLogFile()
-                                .getName(),
-                        RequestBody.create(MediaType.parse("application/octet-stream"),
-                                new File(build.getLogFile()
-                                        .getAbsolutePath())))
-                .build();
-
-        Request request = new Request.Builder()
-                .url(String.format("%s/external/issues/%s/attachments", BASE_PATH, issueKey))
-                .method("POST", body)
-                .addHeader("Authorization", "JWT " + token)
-                .build();
-
-        this.httpClient.newCall(request)
-                .execute();
-
+    public String getNewFile(AbstractBuild<?, ?> build, String path) {
+        return path + "_" + build.getDisplayName() + "_" + build.getResult();
     }
 
-    public void addComment(AbstractBuild<?, ?> build, String issueKey, String token) {
-        String logFileName = build.getLogFile()
-                .getName();
-        String comment = String.format("Log file for the failed build is [^%s] ", logFileName);
-
-        ObjectMapper mapper = new ObjectMapper();
-        MediaType json = MediaType.parse("application/json");
+    public void addAttachment(AbstractBuild<?, ?> build, String issueKey, String token, File file)
+            throws IOException {
         try {
-            CommentRequestModel commentRequestModel = new CommentRequestModel(comment);
-            String bodyString = mapper.writeValueAsString(commentRequestModel);
-            RequestBody body = RequestBody.create(json, bodyString);
+            HttpPost post = new HttpPost(
+                    String.format("%s/external/jenkins/issues/%s/attachments", BASE_PATH, issueKey));
+            FileBody fileBody = new FileBody(file, ContentType.DEFAULT_BINARY);
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+            builder.addPart("file", fileBody);
+            HttpEntity entity = builder.build();
 
-            Request request = new Request.Builder()
-                    .url(String.format("%s/external/issues/%s/comments", BASE_PATH, issueKey))
-                    .method("POST", body)
-                    .addHeader("Authorization", "JWT " + token)
-                    .build();
+            post.addHeader("Authorization", "JWT " + token);
+            post.setEntity(entity);
 
-            this.httpClient.newCall(request)
-                    .execute();
+            try (CloseableHttpResponse response = this.httpClient.execute(post)) {
+                EntityUtils.toString(response.getEntity());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addComment(AbstractBuild<?, ?> build, String issueKey, String token, String comment) {
+
+        try {
+
+            String commentBody = String.format("{ \"comment\": \"%s\" }", comment);
+
+            HttpPost request = new HttpPost(
+                    String.format("%s/external/jenkins/issues/%s/comment", BASE_PATH, issueKey));
+            request.addHeader("Authorization", "JWT " + token);
+            request.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            StringEntity stringEntity = new StringEntity(commentBody);
+            request.setEntity(stringEntity);
+
+            try (CloseableHttpResponse response = this.httpClient.execute(request)) {
+                EntityUtils.toString(response.getEntity());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

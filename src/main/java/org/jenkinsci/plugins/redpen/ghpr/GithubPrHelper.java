@@ -16,19 +16,19 @@ public class GithubPrHelper {
     public String getIssueKeyFromPR(AbstractBuild<?, ?> build) throws IOException {
         GHPullRequest pullRequest = this.getGithubPR(build);
 
-        String issueKeyFromBranch = this.getIssueKeyFromDesc(pullRequest.getHead().getRef());
+        String issueKeyFromBranch = this.getIssueKeyFromString(pullRequest.getHead().getRef());
 
-        if(!StringUtils.isBlank(issueKeyFromBranch)) {
+        if (!StringUtils.isBlank(issueKeyFromBranch)) {
             return issueKeyFromBranch;
         }
 
-        String issueKeyFromBranchName = this.getIssueKeyFromDesc(pullRequest.getTitle());
+        String issueKeyFromBranchName = this.getIssueKeyFromString(pullRequest.getTitle());
 
-        if(!StringUtils.isBlank(issueKeyFromBranchName)) {
+        if (!StringUtils.isBlank(issueKeyFromBranchName)) {
             return issueKeyFromBranchName;
         }
 
-        return this.getIssueKeyFromDesc(pullRequest.getBody());
+        return this.getIssueKeyFromString(pullRequest.getBody());
     }
 
     private GHPullRequest getGithubPR(AbstractBuild<?, ?> build) throws IOException {
@@ -48,7 +48,11 @@ public class GithubPrHelper {
                 .getActualPullRequest(cause.getPullID());
     }
 
-    private String getIssueKeyFromDesc(String description) {
-        return IssueKeyExtractor.extractIssueKey(description);
+    public String getIssueKeyFromPR(String branchName) {
+        return getIssueKeyFromString(branchName);
+    }
+
+    private String getIssueKeyFromString(String string) {
+        return IssueKeyExtractor.extractIssueKey(string);
     }
 }

@@ -26,4 +26,12 @@ public class SecretRetriever {
                 .flatMap(creds -> Optional.of(creds.getSecret()))
                 .flatMap(secret -> Optional.of(secret.getPlainText()));
     }
+
+    public List<StringCredentials> getCredential() {
+        return CredentialsProvider.lookupCredentials(
+                StringCredentials.class,
+                Jenkins.get(),
+                ACL.SYSTEM,
+                Collections.emptyList());
+    }
 }

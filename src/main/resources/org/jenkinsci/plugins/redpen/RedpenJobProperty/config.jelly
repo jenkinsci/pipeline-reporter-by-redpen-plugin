@@ -1,21 +1,28 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
-    <f:optionalBlock name="RedpenPlugin" title="${%redpen.plugin}" checked="${instance != null}" field="redpenPlugin">
-        <f:entry title="Credential" field="credentialId">
-            <c:select />
-        </f:entry>
-        <f:entry title="Log File Location Path" field="logFileLocation">
-            <f:textarea/>
-        </f:entry>
-        <f:advanced align="left" title="Select Test FrameWork To direct Get Logs form build">
-            <f:entry title="Select Your Unit Test FrameWork">
-                <f:select field="unitTestFrameWork">
-                </f:select>
+    <f:section title="${%redpen.plugin}">
+        <f:optionalBlock name="RedpenPlugin" title="${%redpen.plugin}" checked="${instance != null}"
+                         field="redpenPlugin">
+            <f:entry title="Credential" field="credentialId">
+                <c:select/>
             </f:entry>
-            <f:entry title="Select Your E2E Test FrameWork">
-                <f:select field="e2eTestFrameWork">
-                </f:select>
+            <f:entry title="Log File Location Path" field="logFileLocation">
+                <f:textarea/>
             </f:entry>
-        </f:advanced>
-    </f:optionalBlock>
+            <f:advanced align="left" title="Select Test FrameWork To direct Get Logs form build">
+                <f:entry title="Select Your Unit Test FrameWork">
+                    <f:select field="unitTestFrameWork">
+                    </f:select>
+                </f:entry>
+                <f:entry title="Select Your E2E Test FrameWork">
+                    <f:select field="e2eTestFrameWork">
+                    </f:select>
+                </f:entry>
+                <f:entry title="Select Your Coverage FrameWork">
+                    <f:select field="coverageFrameWork">
+                    </f:select>
+                </f:entry>
+            </f:advanced>
+        </f:optionalBlock>
+    </f:section>
 </j:jelly>

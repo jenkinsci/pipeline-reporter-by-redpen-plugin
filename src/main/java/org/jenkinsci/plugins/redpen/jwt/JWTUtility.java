@@ -13,6 +13,7 @@ public class JWTUtility {
 
     public static final String SC_ID = "serviceConnectionId";
     public static final String SECRET = "secret";
+    public static final String ID = "id";
 
     private JWTUtility() {
         // empty
@@ -25,12 +26,14 @@ public class JWTUtility {
         JSONObject json = new JSONObject(s);
         String serviceConnectionId = json.getString(SC_ID);
         String secret = json.getString(SECRET);
+        String id = json.getString(ID);
 
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("auth0")
                     .withSubject(serviceConnectionId)
+                    .withClaim(ID, id)
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             LOGGER.warning(exception.getMessage());
@@ -38,5 +41,6 @@ public class JWTUtility {
         }
 
     }
+
     private static final Logger LOGGER = Logger.getLogger(JWTUtility.class.getName());
 }

@@ -56,8 +56,10 @@ public class RedpenJenkinsLogic {
 
         List<String> unitTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getUnitTestFrameWork(), basePath, buildTriggerTime);
         List<String> e2eTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getE2eTestFrameWork(), basePath, buildTriggerTime);
+        List<String> coverageUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getCoverageFrameWork(), basePath, buildTriggerTime);
         allFiles.addAll(unitTestUploadedFiles);
         allFiles.addAll(e2eTestUploadedFiles);
+        allFiles.addAll(coverageUploadedFiles);
 
         // jobURL : "http:<jenkins-server-url>/job/<project-name>/<job-number>"
         String jobURL = String.format("%s%s/%s/%s", Jenkins.get().getRootUrl(), "job", projectName, parameter.getBuildNumber());
@@ -162,6 +164,7 @@ public class RedpenJenkinsLogic {
                 .buildTriggerTime(build.getTime().toInstant())
                 .e2eTestFrameWork(redpenPluginJobProperties.getE2eTestFrameWork())
                 .unitTestFrameWork(redpenPluginJobProperties.getUnitTestFrameWork())
+                .coverageFrameWork(redpenPluginJobProperties.getCoverageFrameWork())
                 .logFileLocation(redpenPluginJobProperties.getLogFileLocation()).build();
     }
 }

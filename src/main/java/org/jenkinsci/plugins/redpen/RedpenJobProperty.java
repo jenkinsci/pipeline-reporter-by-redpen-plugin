@@ -34,13 +34,16 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
     private String logFileLocation;
     private String unitTestFrameWork;
     private String e2eTestFrameWork;
+    private String coverageFrameWork;
 
     @DataBoundConstructor
-    public RedpenJobProperty(String credentialId, String logFileLocation, String unitTestFrameWork, String e2eTestFrameWork) {
+    public RedpenJobProperty(String credentialId, String logFileLocation, String unitTestFrameWork,
+                             String e2eTestFrameWork, String coverageFrameWork) {
+        this.credentialId = credentialId;
         this.logFileLocation = logFileLocation;
         this.unitTestFrameWork = unitTestFrameWork;
         this.e2eTestFrameWork = e2eTestFrameWork;
-        this.credentialId = credentialId;
+        this.coverageFrameWork = coverageFrameWork;
     }
 
     @Extension
@@ -60,7 +63,7 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
         @Override
         public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) throws Descriptor.FormException {
 
-            if (req != null)  {
+            if (req != null) {
                 RedpenJobProperty redpenPluginInstance = req.bindJSON(
                         RedpenJobProperty.class,
                         net.sf.json.JSONObject.fromObject(formData.getJSONObject(Constants.REDPEN_PLUGIN))
@@ -86,6 +89,15 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
             list.add(Constants.NUNIT_DISPLAY_NAME, Constants.NUNIT);
             list.add(Constants.JACOCO_DISPLAY_NAME, Constants.JACOCO);
             list.add(Constants.JEST_DISPLAY_NAME, Constants.JEST);
+
+            return list;
+        }
+
+        public ListBoxModel doFillCoverageFrameWorkItems() {
+
+            ListBoxModel list = new ListBoxModel();
+            list.add(Constants.NONE_DISPLAY_NAME, null);
+            list.add(Constants.JACOCO_DISPLAY_NAME, Constants.JACOCO);
 
             return list;
         }

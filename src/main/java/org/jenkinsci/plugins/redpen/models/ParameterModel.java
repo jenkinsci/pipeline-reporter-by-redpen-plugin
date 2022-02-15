@@ -21,4 +21,5 @@ public class ParameterModel {
     private String e2eTestFrameWork;
     private String unitTestFrameWork;
     private String logFileLocation;
+    private String coverageFrameWork;
 }

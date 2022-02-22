@@ -9,6 +9,7 @@ import org.jenkinsci.plugins.redpen.models.Constants;
 import org.jenkinsci.plugins.redpen.models.ParameterModel;
 import org.jenkinsci.plugins.redpen.models.TestFrameWork;
 import org.jenkinsci.plugins.redpen.redpenservices.RedpenService;
+import org.jenkinsci.plugins.redpen.util.PathUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class RedpenJenkinsLogic {
 
 
         RedpenService redpenService = RedpenService.getRedpenInstance();
-        String jwtToken = JWTUtility.getJWTToken(parameter.getSecret());
+        String jwtToken = JWTUtility.getJWTToken(parameter.getSecret(), parameter.getUserEmail(), parameter.getUserPassword().getPlainText());
         String newLogFilePath = redpenService.getNewFile(logAbsolutePath, displayName, result);
         // build log's absolute file path
         File buildLogFile = new File(logAbsolutePath);
@@ -49,14 +50,14 @@ public class RedpenJenkinsLogic {
         String currentDir = System.getenv().get(Constants.JENKINS_HOME);
 
         if (currentDir == null) {
-            currentDir = String.format("%s/%s", System.getProperty("user.dir"), "work");
+            currentDir = String.format("%s%s", System.getProperty("user.dir"), "/work");
         }
         List<String> allFiles = new ArrayList<>();
-        String basePath = String.format("%s/workspace/%s", currentDir, projectName);
+        String basePath = PathUtils.getPath(String.format("%s/workspace/%s", currentDir, projectName));
 
-        List<String> unitTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getUnitTestFrameWork(), basePath, buildTriggerTime);
-        List<String> e2eTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getE2eTestFrameWork(), basePath, buildTriggerTime);
-        List<String> coverageUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getCoverageFrameWork(), basePath, buildTriggerTime);
+        List<String> unitTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getUnitTestFrameWork(), parameter.getUnitTestFrameWorkPath(), basePath, buildTriggerTime);
+        List<String> e2eTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getE2eTestFrameWork(), parameter.getE2eTestFrameWorkPath(),basePath, buildTriggerTime);
+        List<String> coverageUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getCoverageFrameWork(), parameter.getCoverageFrameWorkPath(),basePath, buildTriggerTime);
         allFiles.addAll(unitTestUploadedFiles);
         allFiles.addAll(e2eTestUploadedFiles);
         allFiles.addAll(coverageUploadedFiles);
@@ -70,7 +71,7 @@ public class RedpenJenkinsLogic {
             String trimPath = s.trim();
             if (!StringUtils.isBlank(trimPath)) {
                 String logPath = String.format("%s%s", basePath, trimPath);
-                List<String> reportFiles = attachLogFiles(buildTriggerTime, logPath, issueKey, jwtToken);
+                List<String> reportFiles = attachLogFiles(buildTriggerTime, logPath, issueKey, jwtToken, true);
                 allFiles.addAll(reportFiles);
             }
         }
@@ -90,23 +91,25 @@ public class RedpenJenkinsLogic {
         redpenService.addComment(issueKey, jwtToken, comment.toString());
     }
 
-    private List<String> uploadFilesFromSelectedTestFrameWork (String issueKey, String jwtToken, String frameWork, String basePath, Instant buildTriggerTime) throws IOException {
+    private List<String> uploadFilesFromSelectedTestFrameWork (String issueKey, String jwtToken, String frameWork, String frameWorkPath, String basePath, Instant buildTriggerTime) throws IOException {
         List<String> allFiles = new ArrayList<>();
-        Optional<TestFrameWork> availableInList = isAvailableInList(frameWork);
+        Optional<TestFrameWork> availableInList = RedpenJenkinsLogic.isAvailableInList(frameWork);
         if (availableInList.isPresent() && availableInList.get().getValue() != null) {
-            List<String> reportFiles = attachLogFiles(buildTriggerTime, String.format("%s%s", basePath, availableInList.get().getPath()),
-                    issueKey, jwtToken);
+            String fileRelativePath = !StringUtils.isBlank(frameWorkPath) ? frameWorkPath : availableInList.get().getPath();
+            String fileAbsolutePath = String.format("%s%s", basePath,  fileRelativePath);
+            List<String> reportFiles = attachLogFiles(buildTriggerTime, PathUtils.getPath(fileAbsolutePath),
+                    issueKey, jwtToken, !StringUtils.isBlank(frameWorkPath));
             allFiles.addAll(reportFiles);
         }
         return allFiles;
     }
 
-    private Optional<TestFrameWork> isAvailableInList(String key) {
+    public static Optional<TestFrameWork> isAvailableInList(String key) {
         return Constants.TEST_FRAME_WORKS.stream().filter(a -> a.getValue().equals(key)).findFirst();
     }
 
 
-    private List<String> attachLogFiles(Instant buildStartTime, String filePath, String issueKey, String jwtToken)
+    private List<String> attachLogFiles(Instant buildStartTime, String filePath, String issueKey, String jwtToken, Boolean isMandatory)
             throws IOException {
         File logs = new File(filePath);
         RedpenService redpenService = RedpenService.getRedpenInstance();
@@ -124,7 +127,7 @@ public class RedpenJenkinsLogic {
 
             int after = from.compareTo(fileTime);
 
-            if (after < 0) {
+            if (after < 0 || isMandatory) {
                 redpenService.addAttachment(issueKey, jwtToken, file);
                 fileNames.add(file.getName());
             }
@@ -165,6 +168,11 @@ public class RedpenJenkinsLogic {
                 .e2eTestFrameWork(redpenPluginJobProperties.getE2eTestFrameWork())
                 .unitTestFrameWork(redpenPluginJobProperties.getUnitTestFrameWork())
                 .coverageFrameWork(redpenPluginJobProperties.getCoverageFrameWork())
-                .logFileLocation(redpenPluginJobProperties.getLogFileLocation()).build();
+                .logFileLocation(redpenPluginJobProperties.getLogFileLocation())
+                .e2eTestFrameWorkPath(redpenPluginJobProperties.getE2eTestFrameWorkPath())
+                .unitTestFrameWorkPath(redpenPluginJobProperties.getUnitTestFrameWorkPath())
+                .coverageFrameWorkPath(redpenPluginJobProperties.getCoverageFrameWorkPath())
+                .userEmail(redpenPluginJobProperties.getUserEmail())
+                .userPassword(redpenPluginJobProperties.getUserPassword()).build();
     }
 }

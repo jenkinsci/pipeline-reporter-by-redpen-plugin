@@ -4,6 +4,7 @@ import hudson.Extension;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.listeners.RunListener;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.redpen.ghpr.GithubPrHelper;
 import org.jenkinsci.plugins.redpen.models.Constants;
 import org.jenkinsci.plugins.redpen.models.ParameterModel;
@@ -23,7 +24,8 @@ public class RedpenJenkinsListener extends RunListener<Run> {
     @Override
     public void onFinalized(Run build) {
 
-        Optional<Object> redpenPluginJobPropertiesOptional = build.getParent().getAllProperties().stream().filter(RedpenJobProperty.class::isInstance)
+        Optional<Object> redpenPluginJobPropertiesOptional = build.getParent().getAllProperties().stream()
+                .filter(RedpenJobProperty.class::isInstance)
                 .findFirst();
 
         if (redpenPluginJobPropertiesOptional.isPresent()) {
@@ -36,13 +38,20 @@ public class RedpenJenkinsListener extends RunListener<Run> {
                 try {
                     GithubPrHelper githubPrHelper = new GithubPrHelper();
                     String issueKey = githubPrHelper
-                            .getIssueKeyFromPR(build.getEnvironment().get(Constants.GIT_BRANCH, "main"));
-                    SecretRetriever secretRetriever = new SecretRetriever();
-                    Optional<String> secret = secretRetriever.getSecretFor(redpenPluginJobProperties.getCredentialId());
-                    RedpenJenkinsLogic redpenJenkinsLogic = new RedpenJenkinsLogic();
-                    if (secret.isPresent()) {
-                        ParameterModel param = redpenJenkinsLogic.getParameterModel(secret.get(), issueKey, build, redpenPluginJobProperties);
-                        redpenJenkinsLogic.doPerform(param);
+                            .getIssueKeyFromPR(build.getEnvironment().get(Constants.GIT_BRANCH, Constants.GIT_BRANCH_MAIN));
+                    if (StringUtils.isBlank(issueKey)) {
+                        issueKey = githubPrHelper
+                                .getIssueKeyFromPR(build);
+                    }
+                    if (!StringUtils.isBlank(issueKey)) {
+                        SecretRetriever secretRetriever = new SecretRetriever();
+                        Optional<String> secret = secretRetriever.getSecretFor(redpenPluginJobProperties.getCredentialId());
+                        RedpenJenkinsLogic redpenJenkinsLogic = new RedpenJenkinsLogic();
+                        if (secret.isPresent()) {
+                            ParameterModel param = redpenJenkinsLogic.getParameterModel(secret.get(), issueKey, build,
+                                    redpenPluginJobProperties);
+                            redpenJenkinsLogic.doPerform(param);
+                        }
                     }
                 } catch (IOException e) {
                     LOGGER.warning(e.getMessage());

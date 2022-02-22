@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.redpen.models;
 
+import hudson.util.Secret;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,4 +23,9 @@ public class ParameterModel {
     private String unitTestFrameWork;
     private String logFileLocation;
     private String coverageFrameWork;
+    private String unitTestFrameWorkPath;
+    private String e2eTestFrameWorkPath;
+    private String coverageFrameWorkPath;
+    private String userEmail;
+    private Secret userPassword;
 }

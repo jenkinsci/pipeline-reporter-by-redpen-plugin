@@ -3,26 +3,50 @@
     <f:section title="${%redpen.plugin}">
         <f:optionalBlock name="RedpenPlugin" title="${%redpen.plugin}" checked="${instance != null}"
                          field="redpenPlugin">
+
             <f:entry title="Credential" field="credentialId">
                 <c:select/>
             </f:entry>
+            <f:entry title="Email" field="userEmail">
+                <f:textbox />
+            </f:entry>
+            <f:entry title="Jira Token" field="userPassword">
+                <f:password/>
+            </f:entry>
+            <f:entry title="Select Your Unit Test Framework">
+                <f:select field="unitTestFrameWork"/>
+            </f:entry>
+            <f:advanced align="left" title="Choose custom path for unit test">
+                <f:entry>
+                    <f:textbox field="unitTestFrameWorkPath"
+                               placeholder="Add absolute path from your workspace i.e '/src/main.java'"/>
+                </f:entry>
+            </f:advanced>
+            <f:entry title="Select Your E2E Test Framework">
+                <f:select field="e2eTestFrameWork">
+                </f:select>
+            </f:entry>
+            <f:advanced align="left" title="Choose custom path for E2E test">
+                <f:entry>
+                    <f:textbox field="e2eTestFrameWorkPath"
+                               placeholder="Add absolute path from your workspace i.e '/src/main.java'"/>
+                </f:entry>
+            </f:advanced>
+            <f:entry title="Select Your Coverage Framework">
+                <f:select field="coverageFrameWork">
+                </f:select>
+            </f:entry>
+            <f:advanced align="left" title="Choose custom path for Coverage">
+                <f:entry>
+                    <f:textbox field="coverageFrameWorkPath"
+                               placeholder="Add absolute path from your workspace i.e '/src/main.java'"/>
+                </f:entry>
+            </f:advanced>
             <f:entry title="Log File Location Path" field="logFileLocation">
                 <f:textarea/>
             </f:entry>
-            <f:advanced align="left" title="Select Test FrameWork To direct Get Logs form build">
-                <f:entry title="Select Your Unit Test FrameWork">
-                    <f:select field="unitTestFrameWork">
-                    </f:select>
-                </f:entry>
-                <f:entry title="Select Your E2E Test FrameWork">
-                    <f:select field="e2eTestFrameWork">
-                    </f:select>
-                </f:entry>
-                <f:entry title="Select Your Coverage FrameWork">
-                    <f:select field="coverageFrameWork">
-                    </f:select>
-                </f:entry>
-            </f:advanced>
+
+            <hr/>
         </f:optionalBlock>
     </f:section>
 </j:jelly>

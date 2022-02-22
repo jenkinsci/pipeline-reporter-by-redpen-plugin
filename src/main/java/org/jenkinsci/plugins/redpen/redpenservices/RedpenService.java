@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.redpen.redpenservices;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -57,11 +58,21 @@ public class RedpenService {
             post.setEntity(entity);
 
             try (CloseableHttpResponse response = this.httpClient.execute(post)) {
-                EntityUtils.toString(response.getEntity());
+                responseHandler(response, "Upload Attachment");
             }
 
         } catch (IOException e) {
             LOGGER.warning(e.getMessage());
+        }
+    }
+
+    private void responseHandler(CloseableHttpResponse response, String message) throws IOException {
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            EntityUtils.toString(response.getEntity());
+        } else {
+
+            LOGGER.warning(String.format("Unable to %s pm status %s message %s", message,
+                    response.getStatusLine().getStatusCode(), response.getEntity().toString()));
         }
     }
 
@@ -80,11 +91,12 @@ public class RedpenService {
             request.setEntity(stringEntity);
 
             try (CloseableHttpResponse response = this.httpClient.execute(request)) {
-                EntityUtils.toString(response.getEntity());
+                responseHandler(response, "add comment");
             }
         } catch (IOException e) {
             LOGGER.warning(e.getMessage());
         }
     }
+
     private static final Logger LOGGER = Logger.getLogger(RedpenService.class.getName());
 }

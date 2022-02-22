@@ -1,7 +1,7 @@
 package org.jenkinsci.plugins.redpen.ghpr;
 
-import hudson.model.AbstractBuild;
 import hudson.model.Job;
+import hudson.model.Run;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.redpen.util.IssueKeyExtractor;
 import org.jenkinsci.plugins.ghprb.Ghprb;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class GithubPrHelper {
 
-    public String getIssueKeyFromPR(AbstractBuild<?, ?> build) throws IOException {
+    public String getIssueKeyFromPR(Run<?, ?> build) throws IOException {
         GHPullRequest pullRequest = this.getGithubPR(build);
 
         String issueKeyFromBranch = this.getIssueKeyFromString(pullRequest.getHead().getRef());
@@ -31,7 +31,7 @@ public class GithubPrHelper {
         return this.getIssueKeyFromString(pullRequest.getBody());
     }
 
-    private GHPullRequest getGithubPR(AbstractBuild<?, ?> build) throws IOException {
+    private GHPullRequest getGithubPR(Run<?, ?> build) throws IOException {
         Job<?, ?> project = build.getParent();
         GhprbTrigger trigger = Ghprb.extractTrigger(project);
         if (trigger == null) {

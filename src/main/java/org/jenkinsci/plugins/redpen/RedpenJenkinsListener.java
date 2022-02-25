@@ -4,11 +4,13 @@ import hudson.Extension;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.listeners.RunListener;
+import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.redpen.ghpr.GithubPrHelper;
 import org.jenkinsci.plugins.redpen.models.Constants;
-import org.jenkinsci.plugins.redpen.models.ParameterModel;
 import org.jenkinsci.plugins.redpen.secrets.SecretRetriever;
+import org.redpen.RedpenJenkinsCore;
+import org.redpen.model.ParameterModel;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -46,11 +48,13 @@ public class RedpenJenkinsListener extends RunListener<Run> {
                     if (!StringUtils.isBlank(issueKey)) {
                         SecretRetriever secretRetriever = new SecretRetriever();
                         Optional<String> secret = secretRetriever.getSecretFor(redpenPluginJobProperties.getCredentialId());
-                        RedpenJenkinsLogic redpenJenkinsLogic = new RedpenJenkinsLogic();
                         if (secret.isPresent()) {
-                            ParameterModel param = redpenJenkinsLogic.getParameterModel(secret.get(), issueKey, build,
+                            ParameterModel param = getParameterModel(secret.get(), issueKey, build,
                                     redpenPluginJobProperties);
-                            redpenJenkinsLogic.doPerform(param);
+
+                            RedpenJenkinsCore redpenJenkinsCore = new RedpenJenkinsCore();
+                            redpenJenkinsCore.doPerform(param);
+
                         }
                     }
                 } catch (IOException e) {
@@ -61,6 +65,31 @@ public class RedpenJenkinsListener extends RunListener<Run> {
                 }
             }
         }
+    }
+
+    private ParameterModel getParameterModel(String secret, String issueKey, Run build, RedpenJobProperty redpenPluginJobProperties) {
+        ParameterModel parameterModel = new ParameterModel();
+
+        parameterModel.setSecret(secret);
+        parameterModel.setIssueKey(issueKey);
+        parameterModel.setLogAbsolutePath(build.getLogFile().getAbsolutePath());
+        parameterModel.setLogFileLocation(redpenPluginJobProperties.getLogFileLocation());
+        parameterModel.setDisplayName(build.getDisplayName());
+        parameterModel.setResult(String.valueOf(build.getResult()));
+        parameterModel.setProjectName(build.getParent().getName());
+        parameterModel.setBuildNumber(build.getSearchUrl());
+        parameterModel.setBuildTriggerTime(build.getTime().toInstant());
+        parameterModel.setE2eTestFrameWork(redpenPluginJobProperties.getE2eTestFrameWork());
+        parameterModel.setE2eTestFrameWorkPath(redpenPluginJobProperties.getE2eTestFrameWorkPath());
+        parameterModel.setUnitTestFrameWork(redpenPluginJobProperties.getUnitTestFrameWork());
+        parameterModel.setUnitTestFrameWorkPath(redpenPluginJobProperties.getUnitTestFrameWorkPath());
+        parameterModel.setCoverageFrameWork(redpenPluginJobProperties.getCoverageFrameWork());
+        parameterModel.setCoverageFrameWorkPath(redpenPluginJobProperties.getCoverageFrameWorkPath());
+        parameterModel.setUserEmail(redpenPluginJobProperties.getUserEmail());
+        parameterModel.setUserPassword(redpenPluginJobProperties.getUserPassword().getPlainText());
+        parameterModel.setRootURL(Jenkins.get().getRootUrl());
+
+        return parameterModel;
     }
 
     private static final Logger LOGGER = Logger.getLogger(RedpenJenkinsListener.class.getName());

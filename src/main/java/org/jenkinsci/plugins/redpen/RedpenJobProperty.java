@@ -12,8 +12,8 @@ import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
-import hudson.util.ListBoxModel;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import jenkins.model.ParameterizedJobMixIn;
 import lombok.Data;
@@ -22,11 +22,12 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.jenkinsci.plugins.redpen.models.Constants;
-import org.jenkinsci.plugins.redpen.models.TestFrameWork;
 import org.jenkinsci.plugins.redpen.secrets.SecretRetriever;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.redpen.RedpenJenkinsCore;
+import org.redpen.model.TestFrameWork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +104,6 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
             list.add(Constants.NONE_DISPLAY_NAME, null);
             list.add(Constants.JUNIT_DISPLAY_NAME, Constants.JUNIT);
             list.add(Constants.NUNIT_DISPLAY_NAME, Constants.NUNIT);
-            list.add(Constants.JACOCO_DISPLAY_NAME, Constants.JACOCO);
             list.add(Constants.JEST_DISPLAY_NAME, Constants.JEST);
 
             return list;
@@ -171,10 +171,10 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
             if (StringUtils.isBlank(value)) {
                 return FormValidation.ok();
             }
-            Optional<TestFrameWork> availableInList = RedpenJenkinsLogic.isAvailableInList(value);
+            Optional<TestFrameWork> availableInList = RedpenJenkinsCore.isAvailableInList(value);
             if (availableInList.isPresent()) {
                 TestFrameWork testFrameWork = availableInList.get();
-                return FormValidation.ok(String.format("Default Path is : '%s' ", testFrameWork.getPath()));
+                return FormValidation.ok(String.format("Default Path : '%s' ", testFrameWork.getPath()));
             }
             return FormValidation.ok();
         }

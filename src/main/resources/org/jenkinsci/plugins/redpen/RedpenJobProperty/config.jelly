@@ -3,20 +3,47 @@
     <f:section title="${%redpen.plugin}">
         <f:optionalBlock name="RedpenPlugin" title="${%redpen.plugin}" checked="${instance != null}"
                          field="redpenPlugin">
-            <f:entry title="Redpen Credentials" field="credentialId">
+            <f:description>
+                Redpen Jenkins Plugin helps in reporting the pipeline statuses (failure/success) and logs directly to
+                the Jira tickets.
+                <br/>
+                Visit <a
+                    href="https://www.redpen.ai/?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
+                    target="_blank">Redpen Jenkins Plugin
+            </a> for
+                know more.
+            </f:description>
+            <br/>
+            <f:entry title="Redpen credentials" field="credentialId">
                 <c:select/>
+                <f:description>
+                    Select existing or add new credentials. To add a new credentials, <a target="_blank"
+                                                                                         href="https://app.redpen.ai/auth/signin?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration">
+                    Sign in
+                </a> to Redpen and <a
+                        href="https://support.redpen.ai/hc/en-us/articles/4613856461581-How-to-generate-new-Jenkins-Credentials-for-Redpen-Jenkins-Plugin?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
+                        target="_blank">generate a Jenkins credentials
+                </a> for a Jira site connected.
+                </f:description>
             </f:entry>
-            <f:entry title="Jira Email" field="userEmail">
-                <f:textbox/>
+            <f:entry title="Reporter" field="userEmail"
+                     description="Add the email of the Jira user that you want to be a reporter of the comments in the Jira tickets. The email address must be a valid Jira user and has access to the Jira site. ">
+                <f:textbox placeholder="Email Address"/>
             </f:entry>
-            <f:entry title="Jira Token" field="userPassword">
+            <f:entry title="Reporter API token" field="userPassword">
                 <f:password/>
+                <f:description>
+                    Add the API token of the Reporter. The API token must be of the Jira user you have added as a
+                    reporter above. Refer to know <a
+                        href="https://support.redpen.ai/hc/en-us/articles/4629444300173-How-to-generate-Jira-API-token-of-an-Atlassian-user-account?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
+                        target="_blank">how to generate Jira user API token</a>.
+                </f:description>
             </f:entry>
 
             <f:entry title="Unit test framework" field="unitTestFrameWork">
                 <f:select/>
             </f:entry>
-            <f:advanced title="Add or Update custom path" align="left">
+            <f:advanced title="Custom Path" align="left">
                 <f:entry field="unitTestFrameWorkPath">
                     <f:textbox
                             placeholder="Add absolute path from workspace. i.e '/src/unit-tests/logs/log.json' or 'src/unit-tests/logs'"/>
@@ -26,7 +53,7 @@
             <f:entry title="E2E test framework" field="e2eTestFrameWork">
                 <f:select/>
             </f:entry>
-            <f:advanced title="Add or Update custom path" align="left">
+            <f:advanced title="Custom Path" align="left">
                 <f:entry field="e2eTestFrameWorkPath">
                     <f:textbox
                             placeholder="Add absolute path from workspace. i.e '/src/unit-tests/logs/log.json' or 'src/unit-tests/logs'"/>
@@ -36,15 +63,16 @@
             <f:entry title="Code coverage framework" field="coverageFrameWork">
                 <f:select/>
             </f:entry>
-            <f:advanced title="Add or Update custom path" align="left">
+            <f:advanced title="Custom Path" align="left">
                 <f:entry field="coverageFrameWorkPath">
                     <f:textbox
                             placeholder="Add absolute path from workspace. i.e '/src/unit-tests/logs/log.json' or 'src/unit-tests/logs'"/>
                 </f:entry>
             </f:advanced>
 
-            <f:entry title="Other files paths" field="logFileLocation">
+            <f:entry title="Attach additional files from paths" field="logFileLocation">
                 <f:textarea/>
+                <f:description>e.g. /logs, /resource/content.xml, /e2e/screenshots</f:description>
             </f:entry>
             <hr/>
         </f:optionalBlock>

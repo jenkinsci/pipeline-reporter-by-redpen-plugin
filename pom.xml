@@ -120,7 +120,7 @@
         <dependency>
             <groupId>org.redpen</groupId>
             <artifactId>redpen-jenkins-core</artifactId>
-            <version>1.0.10-OBF-SNAPSHOT-QA</version>
+            <version>1.0.12</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.sonatype.sisu</groupId>

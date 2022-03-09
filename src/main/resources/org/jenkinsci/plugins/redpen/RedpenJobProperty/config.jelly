@@ -4,8 +4,7 @@
         <f:optionalBlock name="RedpenPlugin" title="${%redpen.plugin}" checked="${instance != null}"
                          field="redpenPlugin">
             <f:description>
-                Redpen Jenkins Plugin helps in reporting the pipeline statuses (failure/success) and logs directly to
-                the Jira tickets.
+                Redpen Jenkins Plugin reports the pipeline status, logs, and artifacts directly to the Jira tickets.
                 <br/>
                 Visit <a
                     href="https://www.redpen.ai/?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"

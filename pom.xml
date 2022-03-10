@@ -20,6 +20,8 @@
         <jenkins.version>2.320</jenkins.version>
         <java.level>8</java.level>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
+        <sonar.organization>ajmerainfotech</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
     <name>Redpen-jenkins-integration</name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
@@ -120,7 +122,7 @@
         <dependency>
             <groupId>org.redpen</groupId>
             <artifactId>redpen-jenkins-core</artifactId>
-            <version>1.0.12</version>
+            <version>1.0.13</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.sonatype.sisu</groupId>

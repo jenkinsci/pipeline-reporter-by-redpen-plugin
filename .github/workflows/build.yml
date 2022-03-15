@@ -38,4 +38,4 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_USER_REF: ${{ secrets.GH_PACKAGE_REPO_USERNAME }}
           GITHUB_TOKEN_REF: ${{ secrets.GH_PACKAGE_REPO_PASSWORD }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=AjmeraInfotech_redpen-jenkins-integration
+        run: mvn -B -Pgithub package --file pom.xml verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=AjmeraInfotech_redpen-jenkins-integration

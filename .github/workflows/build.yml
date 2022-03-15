@@ -17,6 +17,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+          server-id: github # value of repository/id field of the pom.xml
+          server-username: GITHUB_USER_REF  # env variable name for username
+          server-password: GITHUB_TOKEN_REF # env variable name for GitHub Personal Access Token
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
         with:
@@ -33,4 +36,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_USER_REF: ${{ secrets.GH_PACKAGE_REPO_USERNAME }}
+          GITHUB_TOKEN_REF: ${{ secrets.GH_PACKAGE_REPO_PASSWORD }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=AjmeraInfotech_redpen-jenkins-integration

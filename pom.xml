@@ -173,9 +173,5 @@
             <id>repo.jenkins-ci.org</id>
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
-        <pluginRepository>
-            <id>org.redpen</id>
-            <url>https://maven.pkg.github.com/AjmeraInfotech/redpen-jenkins-core-package</url>
-        </pluginRepository>
     </pluginRepositories>
 </project>

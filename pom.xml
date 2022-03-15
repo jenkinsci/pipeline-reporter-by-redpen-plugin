@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <groupId>org.jenkinsci.plugins</groupId>
-    <artifactId>redpen-jenkins-integration</artifactId>
+    <artifactId>pipeline-status-reporter-by-redpen</artifactId>
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <properties>
@@ -23,7 +23,7 @@
         <sonar.organization>ajmerainfotech</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
-    <name>Redpen-jenkins-integration</name>
+    <name>Redpen - Pipeline Status Reporter for Jira </name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
 
     <dependencyManagement>

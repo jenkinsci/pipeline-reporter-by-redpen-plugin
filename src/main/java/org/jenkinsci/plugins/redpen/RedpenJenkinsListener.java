@@ -38,13 +38,7 @@ public class RedpenJenkinsListener extends RunListener<Run> {
             // Add comment with log file as an attachment in the issue.
             if (result != null && result.isWorseThan(Result.SUCCESS)) {
                 try {
-                    GithubPrHelper githubPrHelper = new GithubPrHelper();
-                    String issueKey = githubPrHelper
-                            .getIssueKeyFromPR(build.getEnvironment().get(Constants.GIT_BRANCH, Constants.GIT_BRANCH_MAIN));
-                    if (StringUtils.isBlank(issueKey)) {
-                        issueKey = githubPrHelper
-                                .getIssueKeyFromPR(build);
-                    }
+                    String issueKey = getIssueKey(build);
                     if (!StringUtils.isBlank(issueKey)) {
                         SecretRetriever secretRetriever = new SecretRetriever();
                         Optional<String> secret = secretRetriever.getSecretFor(redpenPluginJobProperties.getCredentialId());
@@ -65,6 +59,17 @@ public class RedpenJenkinsListener extends RunListener<Run> {
                 }
             }
         }
+    }
+
+    private String getIssueKey(Run build) throws IOException, InterruptedException {
+        GithubPrHelper githubPrHelper = new GithubPrHelper();
+        String issueKey = githubPrHelper
+                .getIssueKeyFromPR(build.getEnvironment().get(Constants.GIT_BRANCH, Constants.GIT_BRANCH_MAIN));
+        if (StringUtils.isBlank(issueKey)) {
+            issueKey = githubPrHelper
+                    .getIssueKeyFromPR(build);
+        }
+        return issueKey;
     }
 
     private ParameterModel getParameterModel(String secret, String issueKey, Run build, RedpenJobProperty redpenPluginJobProperties) {

@@ -23,7 +23,7 @@
         <sonar.organization>ajmerainfotech</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
-    <name>Redpen - Pipeline Status Reporter for Jira </name>
+    <name>Redpen - Pipeline Reporter for Jira </name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
 
     <dependencyManagement>

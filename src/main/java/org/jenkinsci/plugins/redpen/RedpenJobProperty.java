@@ -101,7 +101,7 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
         public ListBoxModel doFillUnitTestFrameWorkItems() {
 
             ListBoxModel list = new ListBoxModel();
-            list.add(Constants.NONE_DISPLAY_NAME, null);
+            list.add(Constants.NONE_DISPLAY_NAME, "");
             list.add(Constants.JUNIT_DISPLAY_NAME, Constants.JUNIT);
             list.add(Constants.NUNIT_DISPLAY_NAME, Constants.NUNIT);
             list.add(Constants.JEST_DISPLAY_NAME, Constants.JEST);
@@ -112,7 +112,7 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
         public ListBoxModel doFillCoverageFrameWorkItems() {
 
             ListBoxModel list = new ListBoxModel();
-            list.add(Constants.NONE_DISPLAY_NAME, null);
+            list.add(Constants.NONE_DISPLAY_NAME, "");
             list.add(Constants.JACOCO_DISPLAY_NAME, Constants.JACOCO);
 
             return list;
@@ -121,7 +121,7 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
         public ListBoxModel doFillE2eTestFrameWorkItems() {
 
             ListBoxModel list = new ListBoxModel();
-            list.add(Constants.NONE_DISPLAY_NAME, null);
+            list.add(Constants.NONE_DISPLAY_NAME, "");
             list.add(Constants.WEB_DRIVER_IO_DISPLAY_NAME, Constants.WEB_DRIVER_IO);
             list.add(Constants.SELENIUM_DISPLAY_NAME, Constants.SELENIUM);
 
@@ -149,7 +149,7 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
                             credentials);
 
             ListBoxModel listBoxModel = new ListBoxModel();
-            listBoxModel.add(Constants.NONE_DISPLAY_NAME, null);
+            listBoxModel.add(Constants.NONE_DISPLAY_NAME, "");
             listBoxModel.addAll(options);
 
             return listBoxModel;

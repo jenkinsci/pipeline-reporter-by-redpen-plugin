@@ -2,27 +2,30 @@
 
 ## Introduction
 
-TODO Describe what your plugin does here
+Redpen Jenkins plugin is an open-sourced plugin that is used to integrate Jenkins with [Jira Software](https://www.atlassian.com/software/jira). This plugin is free to use and provides an easy, secure, and reliable way to way to send build and deployment information from your Jenkins server to your Jira Software. The pipeline reports the build and deployment status (failure or success) with other meaningful data into the Jira issues which helps your team to track and collaborate on the work.
 
-## Getting started
+## Benefits
+ - This plugin integration gives visibility to your team of the CI/CD pipelines related to Jira issues.
 
-TODO Tell users how to configure your plugin here, include screenshots, pipeline examples and 
-configuration-as-code examples.
+ - The plugin reports the build and deployment-related data directly to the Jira issues. So, it is **important** that the branch that triggers the Jenkins pipeline **must have the Jira ticket number in the branch name.** (e.g. [TEST-1234] Deploy v1.2 to production)
 
-## Issues
+ - The plugin eliminates the manual work required by **Software Engineers** to update the Jira issues with the pipeline details.
+ 
+ - The plugin provides visibility to **Product Managers, Team Leads,** and **QA Engineers** into the pipeline like failing or passing builds, tests, and deployments.
 
-TODO Decide where you're going to host your issues, the default is Jenkins JIRA, but you can also enable GitHub issues,
-If you use GitHub issues there's no need for this section; else add the following line:
+## How to get started
+There are four steps to get started with the integration:
 
-Report issues and enhancements in the [Jenkins issue tracker](https://issues.jenkins-ci.org/).
+1. Install Redpen Jenkins Plugin
 
-## Contributing
+2. Generate a new Jenkins Credentials 
+3. Generate Jira API token of an Atlassian user account 
+4. Configure Redpen Jenkins Plugin into a Jenkins Job
 
-TODO review the default [CONTRIBUTING](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) file and make sure it is appropriate for your plugin, if not then add your own one adapted from the base file
-
-Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md)
+[Click here](https://support.redpen.ai/hc/en-us/articles/4727856045069) and follow the steps to integrate and configure the plugin.
 
 ## LICENSE
 
-Licensed under MIT, see [LICENSE](LICENSE.md)
+Licensed under MIT, see [LICENSE](LICENSE)
 
+Please [contact us](https://www.redpen.ai/contact-us) if you have any questions/queries. 

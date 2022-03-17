@@ -9,13 +9,13 @@
         <relativePath/>
     </parent>
     <groupId>org.jenkinsci.plugins</groupId>
-    <artifactId>pipeline-status-reporter-by-redpen</artifactId>
+    <artifactId>pipeline-reporter-by-redpen</artifactId>
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <properties>
         <revision>1.0</revision>
         <changelist>-SNAPSHOT</changelist>
-        <gitHubRepo>jenkinsci/pipeline-status-reporter-by-redpen-plugin</gitHubRepo>
+        <gitHubRepo>jenkinsci/pipeline-reporter-by-redpen-plugin</gitHubRepo>
 
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <jenkins.version>2.330</jenkins.version>
@@ -133,10 +133,6 @@
                 <exclusion>
                     <groupId>net.minidev</groupId>
                     <artifactId>json-smart</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jenkins-ci.plugins</groupId>
-                    <artifactId>matrix-project</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>

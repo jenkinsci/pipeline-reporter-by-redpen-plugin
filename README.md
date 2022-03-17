@@ -1,4 +1,4 @@
-# JiraHelloWorld
+# Redpen - Pipeline Reporter for Jira
 
 ## Introduction
 

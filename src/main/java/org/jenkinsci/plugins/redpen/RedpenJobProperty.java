@@ -8,7 +8,6 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
-import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
@@ -21,13 +20,13 @@ import lombok.EqualsAndHashCode;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
-import org.jenkinsci.plugins.redpen.models.Constants;
+import org.jenkinsci.plugins.redpen.constant.Constants;
+import org.jenkinsci.plugins.redpen.models.TestFrameWork;
 import org.jenkinsci.plugins.redpen.secrets.SecretRetriever;
+import org.jenkinsci.plugins.redpen.service.RedpenJenkinsCore;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-import org.redpen.RedpenJenkinsCore;
-import org.redpen.model.TestFrameWork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +36,8 @@ import java.util.logging.Logger;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
+    private static final Logger LOGGER = Logger.getLogger(RedpenJobProperty.class.getName());
+
     private String credentialId;
     private String userEmail;
     private Secret userPassword;
@@ -50,8 +51,8 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
 
     @DataBoundConstructor
     public RedpenJobProperty(String credentialId, String logFileLocation, String unitTestFrameWork,
-            String e2eTestFrameWork, String coverageFrameWork, String unitTestFrameWorkPath,
-            String e2eTestFrameWorkPath, String coverageFrameWorkPath, String userEmail, Secret userPassword) {
+                             String e2eTestFrameWork, String coverageFrameWork, String unitTestFrameWorkPath,
+                             String e2eTestFrameWorkPath, String coverageFrameWorkPath, String userEmail, Secret userPassword) {
         this.credentialId = credentialId;
         this.logFileLocation = logFileLocation;
         this.unitTestFrameWork = unitTestFrameWork;
@@ -79,23 +80,27 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
         }
 
         @Override
-        public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) throws Descriptor.FormException {
+        public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) {
 
-            if (req != null) {
-                RedpenJobProperty redpenPluginInstance = req.bindJSON(
-                        RedpenJobProperty.class,
-                        net.sf.json.JSONObject.fromObject(formData.getJSONObject(Constants.REDPEN_PLUGIN)));
-                if (redpenPluginInstance == null) {
-                    LOGGER.fine("Couldn't bind JSON");
-                    return null;
-                }
-                if (redpenPluginInstance.credentialId == null) {
-                    LOGGER.fine("Credential not found, nullifying Redpen Plugin");
-                    return null;
-                }
-                return redpenPluginInstance;
+            if (req == null) {
+                return null;
             }
-            return null;
+
+            RedpenJobProperty redpenPluginInstance = req.bindJSON(
+                    RedpenJobProperty.class,
+                    net.sf.json.JSONObject.fromObject(formData.getJSONObject(Constants.REDPEN_PLUGIN)));
+
+            if (redpenPluginInstance == null) {
+                LOGGER.fine("Couldn't bind JSON");
+                return null;
+            }
+
+            if (redpenPluginInstance.credentialId == null) {
+                LOGGER.fine("Credential not found, nullifying Redpen Plugin");
+                return null;
+            }
+
+            return redpenPluginInstance;
         }
 
         public ListBoxModel doFillUnitTestFrameWorkItems() {
@@ -171,15 +176,16 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
             if (StringUtils.isBlank(value)) {
                 return FormValidation.ok();
             }
+
             Optional<TestFrameWork> availableInList = RedpenJenkinsCore.isAvailableInList(value);
+
             if (availableInList.isPresent()) {
                 TestFrameWork testFrameWork = availableInList.get();
                 return FormValidation.ok(String.format("Default Path : '%s' ", testFrameWork.getPath()));
             }
+
             return FormValidation.ok();
         }
 
     }
-
-    private static final Logger LOGGER = Logger.getLogger(RedpenJobProperty.class.getName());
 }

@@ -12,21 +12,25 @@ import java.util.List;
 import java.util.Optional;
 
 public class SecretRetriever {
-    public Optional<String> getSecretFor(final String credentialsId) {
+    /**
+     * Get Jenkins secret by secretId
+     * @param secretId SecretId specified in Jenkins credential Manager
+     * @return an Optional String if secret exist
+     */
+    public Optional<String> getSecretFor(final String secretId) {
 
-        final List<StringCredentials> credentials =
-                CredentialsProvider.lookupCredentials(
-                        StringCredentials.class,
-                        Jenkins.get(),
-                        ACL.SYSTEM,
-                        Collections.emptyList());
-        final CredentialsMatcher matcher = CredentialsMatchers.withId(credentialsId);
+        final List<StringCredentials> credentials = getCredential();
+        final CredentialsMatcher matcher = CredentialsMatchers.withId(secretId);
 
         return Optional.ofNullable(CredentialsMatchers.firstOrNull(credentials, matcher))
-                .flatMap(creds -> Optional.of(creds.getSecret()))
+                .flatMap(credential -> Optional.of(credential.getSecret()))
                 .flatMap(secret -> Optional.of(secret.getPlainText()));
     }
 
+    /**
+     * Get All Secrets
+     * @return List of jenkins secrets
+     */
     public List<StringCredentials> getCredential() {
         return CredentialsProvider.lookupCredentials(
                 StringCredentials.class,

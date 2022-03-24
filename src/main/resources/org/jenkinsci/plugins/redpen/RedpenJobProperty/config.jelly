@@ -25,6 +25,15 @@
                 </a> for a Jira site connected.
                 </f:description>
             </f:entry>
+            <f:entry title="Github Token" field="ghToken">
+                <c:select/>
+                    <f:description>
+                        Select existing or add new credentials. To add a new credentials, <a
+                            href="https://github.com/settings/tokens/new?description=Redpen%20jenkins%20core%20package&amp;scopes=repo:status"
+                            target="_blank">Create github token
+                    </a> for get jira ticket form Pull Request.
+                </f:description>
+            </f:entry>
             <f:entry title="Reporter" field="userEmail"
                      description="Add the email of the Jira user that you want to be a reporter of the comments in the Jira tickets. The email address must be a valid Jira user and has access to the Jira site. ">
                 <f:textbox placeholder="Email Address"/>

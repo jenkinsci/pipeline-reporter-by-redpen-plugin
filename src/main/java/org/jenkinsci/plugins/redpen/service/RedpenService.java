@@ -7,6 +7,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -141,5 +142,22 @@ public class RedpenService {
         node.putIfAbsent("attachments", arrayNode);
 
         return node.toString();
+    }
+
+    public void getPR(String prLink, String token) {
+        try {
+            String path = "";
+
+            HttpGet request = new HttpGet(path);
+
+            request.addHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", token));
+            request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
+
+            try (CloseableHttpResponse response = this.httpClient.execute(request)) {
+                responseHandler(response, "Get github PR");
+            }
+        } catch (IOException e) {
+            LOGGER.warning(e.getMessage());
+        }
     }
 }

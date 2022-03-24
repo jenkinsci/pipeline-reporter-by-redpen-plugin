@@ -10,6 +10,7 @@ import org.jenkinsci.plugins.redpen.ghpr.GithubPrHelper;
 import org.jenkinsci.plugins.redpen.models.ParameterModel;
 import org.jenkinsci.plugins.redpen.secrets.SecretRetriever;
 import org.jenkinsci.plugins.redpen.service.RedpenJenkinsCore;
+import org.jenkinsci.plugins.redpen.service.RedpenService;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class RedpenJenkinsListener extends RunListener<Run> {
             // Add comment with log file as an attachment in the issue.
             if (result != null && result.isWorseThan(Result.SUCCESS)) {
                 try {
-                    String issueKey = getIssueKey(build);
+                    String issueKey = getIssueKey(build, redpenPluginJobProperties.getGhToken().getPlainText());
 
                     SecretRetriever secretRetriever = new SecretRetriever();
                     Optional<String> secret = secretRetriever.getSecretFor(redpenPluginJobProperties.getCredentialId());
@@ -60,10 +61,20 @@ public class RedpenJenkinsListener extends RunListener<Run> {
         }
     }
 
-    private String getIssueKey(Run build) throws IOException, InterruptedException {
+    private String getIssueKey(Run build, String ghToken) throws IOException, InterruptedException {
+        RedpenService service = RedpenService.getRedpenInstance();
         GithubPrHelper githubPrHelper = new GithubPrHelper();
         String issueKey = githubPrHelper
                 .getIssueKeyFromPR(build.getEnvironment().get(Constants.GIT_BRANCH, Constants.GIT_BRANCH_MAIN));
+
+        String prLink = build.getEnvironment().get("GIT_URL" , "");
+
+        if(!StringUtils.isBlank(prLink)) {
+            System.out.println("ghToken " + ghToken);
+            System.out.println("url" + prLink.split("https://github.com/"));
+            service.getPR(prLink, ghToken);
+        }
+
 
         if (StringUtils.isBlank(issueKey)) {
             issueKey = githubPrHelper

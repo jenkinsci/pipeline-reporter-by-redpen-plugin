@@ -48,11 +48,13 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
     private String unitTestFrameWorkPath;
     private String e2eTestFrameWorkPath;
     private String coverageFrameWorkPath;
+    private Secret ghToken;
 
     @DataBoundConstructor
     public RedpenJobProperty(String credentialId, String logFileLocation, String unitTestFrameWork,
                              String e2eTestFrameWork, String coverageFrameWork, String unitTestFrameWorkPath,
-                             String e2eTestFrameWorkPath, String coverageFrameWorkPath, String userEmail, Secret userPassword) {
+                             String e2eTestFrameWorkPath, String coverageFrameWorkPath, String userEmail, Secret userPassword,
+                             Secret ghToken) {
         this.credentialId = credentialId;
         this.logFileLocation = logFileLocation;
         this.unitTestFrameWork = unitTestFrameWork;
@@ -63,6 +65,7 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
         this.coverageFrameWorkPath = coverageFrameWorkPath;
         this.userEmail = userEmail;
         this.userPassword = userPassword;
+        this.ghToken = ghToken;
     }
 
     @Extension
@@ -135,6 +138,15 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
 
         public ListBoxModel doFillCredentialIdItems(
                 @QueryParameter String credentialsId) {
+           return getCreds(credentialsId);
+        }
+
+        public ListBoxModel doFillGhTokenItems(
+                @QueryParameter String credentialsId) {
+            return getCreds(credentialsId);
+        }
+
+        private ListBoxModel getCreds(String credentialsId) {
             List<CredentialsMatcher> matchers = new ArrayList<>();
             if (!StringUtils.isEmpty(credentialsId)) {
                 matchers.add(0, CredentialsMatchers.withId(credentialsId));

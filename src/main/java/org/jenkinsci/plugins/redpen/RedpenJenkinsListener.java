@@ -72,7 +72,7 @@ public class RedpenJenkinsListener extends RunListener<Run> {
 
         if (!StringUtils.isBlank(ghBranchName) && StringUtils.isBlank(issueKey) && !StringUtils.isBlank(ghLink)) {
             String[] ghRepo = ghLink.split("https://github.com/");
-            service.getIssueKeyFromPR(ghRepo[1], ghBranchName, ghToken);
+            issueKey = service.getIssueKeyFromPR(ghRepo[1], ghBranchName, ghToken);
         }
 
         return issueKey;

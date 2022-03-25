@@ -150,7 +150,6 @@ public class RedpenService {
     public String getIssueKeyFromPR(String ghRepo, String branchName, String token) {
         String issueKey = "";
         try {
-            GithubPrHelper githubPrHelper = new GithubPrHelper();
             String path = String.format(Constants.GH_PULLS, ghRepo);
 
             HttpGet request = new HttpGet(path);
@@ -166,16 +165,9 @@ public class RedpenService {
                     JsonNode jsonNode = mapper.readTree(res);
                     JsonNode obj = jsonNode.get(0);
                     if (obj != null) {
-
-                        JsonNode title = obj.get("title");
-                        if(title != null && !StringUtils.isBlank(title.toString())) {
-                            issueKey = githubPrHelper.getIssueKeyFromPR(title.toString());
-                            if(StringUtils.isBlank(issueKey)) {
-                                JsonNode body = obj.get("body");
-                                if(body != null && !StringUtils.isBlank(body.toString())) {
-                                 issueKey = githubPrHelper.getIssueKeyFromPR(body.toString());
-                                }
-                            }
+                        issueKey = getIssueKey(obj, "title");
+                        if(StringUtils.isBlank(issueKey)) {
+                            issueKey = getIssueKey(obj, "body");
                         }
                     }
                 } else {
@@ -188,5 +180,14 @@ public class RedpenService {
             LOGGER.warning(e.getMessage());
         }
         return issueKey;
+    }
+
+    private String getIssueKey(JsonNode obj, String key) {
+        GithubPrHelper githubPrHelper = new GithubPrHelper();
+        JsonNode title = obj.get(key);
+        if(!StringUtils.isBlank(String.valueOf(title))) {
+            return githubPrHelper.getIssueKeyFromPR(title.toString());
+        }
+        return "";
     }
 }

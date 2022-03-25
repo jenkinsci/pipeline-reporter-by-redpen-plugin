@@ -10,6 +10,11 @@ public class Constants {
     private Constants() {
     }
 
+    public static final String GH_PULLS = "https://api.github.com/repos/%s/pulls";
+    public static final String COMMENT = "%s/external/jenkins/issues/%s/comment";
+    public static final String ATTACHMENT = "%s/external/jenkins/issues/%s/attachments";
+    public static final String JWT = "JWT %s";
+
     public static final String WEB_DRIVER_IO = "WEB_DRIVER_IO";
     public static final String JUNIT = "JUNIT";
     public static final String JACOCO = "JACOCO";
@@ -17,6 +22,7 @@ public class Constants {
     public static final String JEST = "JEST";
     public static final String SELENIUM = "SELENIUM";
     public static final String GIT_BRANCH = "GIT_BRANCH";
+    public static final String GIT_URL = "GIT_URL";
     public static final String GIT_BRANCH_MAIN = "main";
 
     public static final String NONE_DISPLAY_NAME = "None";

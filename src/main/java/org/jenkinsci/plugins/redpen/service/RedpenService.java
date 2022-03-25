@@ -1,8 +1,10 @@
 package org.jenkinsci.plugins.redpen.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
@@ -18,6 +20,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jenkinsci.plugins.redpen.constant.Constants;
+import org.jenkinsci.plugins.redpen.ghpr.GithubPrHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +60,7 @@ public class RedpenService {
      */
     public boolean addAttachment(String issueKey, String jwtToken, File file) {
         try {
-            String path = String.format("%s/external/jenkins/issues/%s/attachments", Constants.BASE_PATH, issueKey);
+            String path = String.format(Constants.ATTACHMENT, Constants.BASE_PATH, issueKey);
 
             HttpPost post = new HttpPost(path);
 
@@ -67,7 +70,7 @@ public class RedpenService {
             builder.addPart("file", fileBody);
             HttpEntity entity = builder.build();
 
-            post.addHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
+            post.addHeader(HttpHeaders.AUTHORIZATION, String.format(Constants.JWT, jwtToken));
             post.addHeader("client-id", Constants.CLIENT_ID);
 
             post.setEntity(entity);
@@ -109,12 +112,12 @@ public class RedpenService {
      */
     public void addComment(String issueKey, String jwtToken, String comment, List<String> attachments) {
         try {
-            String path = String.format("%s/external/jenkins/issues/%s/comment", Constants.BASE_PATH, issueKey);
+            String path = String.format(Constants.COMMENT, Constants.BASE_PATH, issueKey);
             String commentBody = getCommentBody(comment, attachments);
 
             HttpPost request = new HttpPost(path);
 
-            request.addHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
+            request.addHeader(HttpHeaders.AUTHORIZATION, String.format(Constants.JWT, jwtToken));
             request.addHeader("client-id", Constants.CLIENT_ID);
             request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 
@@ -144,20 +147,46 @@ public class RedpenService {
         return node.toString();
     }
 
-    public void getPR(String prLink, String token) {
+    public String getIssueKeyFromPR(String ghRepo, String branchName, String token) {
+        String issueKey = "";
         try {
-            String path = "";
+            GithubPrHelper githubPrHelper = new GithubPrHelper();
+            String path = String.format(Constants.GH_PULLS, ghRepo);
 
             HttpGet request = new HttpGet(path);
 
-            request.addHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", token));
+            request.addHeader(HttpHeaders.AUTHORIZATION, String.format(Constants.JWT, token));
             request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
+            request.addHeader("head", branchName);
 
             try (CloseableHttpResponse response = this.httpClient.execute(request)) {
-                responseHandler(response, "Get github PR");
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    String res = EntityUtils.toString(response.getEntity());
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode jsonNode = mapper.readTree(res);
+                    JsonNode obj = jsonNode.get(0);
+                    if (obj != null) {
+
+                        JsonNode title = obj.get("title");
+                        if(title != null && !StringUtils.isBlank(title.toString())) {
+                            issueKey = githubPrHelper.getIssueKeyFromPR(title.toString());
+                            if(StringUtils.isBlank(issueKey)) {
+                                JsonNode body = obj.get("body");
+                                if(body != null && !StringUtils.isBlank(body.toString())) {
+                                 issueKey = githubPrHelper.getIssueKeyFromPR(body.toString());
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    String warning = String.format("Unable to %s pm status %s message %s", "Get PR information",
+                            response.getStatusLine().getStatusCode(), response.getEntity().toString());
+                    LOGGER.warning(warning);
+                }
             }
         } catch (IOException e) {
             LOGGER.warning(e.getMessage());
         }
+        return issueKey;
     }
 }

@@ -13,6 +13,8 @@ import org.jenkinsci.plugins.redpen.service.RedpenJenkinsCore;
 import org.jenkinsci.plugins.redpen.service.RedpenService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -27,23 +29,30 @@ public class RedpenJenkinsListener extends RunListener<Run> {
     @Override
     public void onFinalized(Run build) {
 
+        RedpenPluginConfig redpenPluginConfig = RedpenPluginConfig.all().get(RedpenPluginConfig.class);
+        List<RedpenGlobalConfig> list = new ArrayList<>();
+        if (redpenPluginConfig != null) {
+            list = redpenPluginConfig.getConfigs();
+        }
+
         Optional<Object> redpenPluginJobPropertiesOptional = build.getParent().getAllProperties().stream()
                 .filter(RedpenJobProperty.class::isInstance)
                 .findFirst();
 
         if (redpenPluginJobPropertiesOptional.isPresent()) {
             RedpenJobProperty redpenPluginJobProperties = (RedpenJobProperty) redpenPluginJobPropertiesOptional.get();
+            Optional<RedpenGlobalConfig> config = list.stream().filter(redpenGlobalConfig -> redpenPluginJobProperties.getRedpenConfig().equals(redpenGlobalConfig.getName())).findFirst();
 
             Result result = build.getResult();
             // If the build status is not SUCCESS then
             // Add comment with log file as an attachment in the issue.
-            if (result != null && result.isWorseThan(Result.SUCCESS)) {
+            if (result != null && result.isWorseThan(Result.SUCCESS) && config.isPresent()) {
                 try {
-                    String issueKey = getIssueKey(build, redpenPluginJobProperties.getGhToken().getPlainText());
+//                    String issueKey = getIssueKey(build, redpenPluginJobProperties.getGhToken().getPlainText());
+                    String issueKey = getIssueKey(build, "");
 
                     SecretRetriever secretRetriever = new SecretRetriever();
-                    Optional<String> secret = secretRetriever.getSecretFor(redpenPluginJobProperties.getCredentialId());
-
+                    Optional<String> secret = secretRetriever.getSecretFor(config.get().getToken().getPlainText());
                     if (!StringUtils.isBlank(issueKey) && secret.isPresent()) {
                         ParameterModel param = ParameterModel.getParameterModel(secret.get(), issueKey, build,
                                 redpenPluginJobProperties);

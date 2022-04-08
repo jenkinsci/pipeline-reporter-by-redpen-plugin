@@ -73,14 +73,11 @@ public class RedpenJenkinsCore {
             LOGGER.info("File : " + copiedLogFile.getName() + " is attached");
         }
 
-        List<String> unitTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getUnitTestFrameWork(), parameter.getUnitTestFrameWorkPath(), basePath, buildTriggerTime);
-        allFiles.addAll(unitTestUploadedFiles);
 
-        List<String> e2eTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getE2eTestFrameWork(), parameter.getE2eTestFrameWorkPath(), basePath, buildTriggerTime);
-        allFiles.addAll(e2eTestUploadedFiles);
-
-        List<String> coverageUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getCoverageFrameWork(), parameter.getCoverageFrameWorkPath(), basePath, buildTriggerTime);
-        allFiles.addAll(coverageUploadedFiles);
+        for (String path:parameter.getPaths()) {
+           List<String> paths = uploadFilesFromSelectedTestFrameWork(issueKey,jwtToken,path, basePath,buildTriggerTime);
+           allFiles.addAll(paths);
+        }
 
         String[] logDir = parameter.getLogFileLocation().trim().split(",");
 
@@ -141,7 +138,8 @@ public class RedpenJenkinsCore {
      * @return JWT Token to make API call
      */
     private String getJWT(ParameterModel parameter) {
-        return JWTUtility.getJWTToken(parameter.getSecret(), parameter.getUserEmail(), parameter.getUserPassword());
+//        return JWTUtility.getJWTToken(parameter.getSecret(), parameter.getUserEmail(), parameter.getUserPassword());
+        return JWTUtility.getJWTToken(parameter.getSecret(), "", "");
     }
 
     /**
@@ -184,25 +182,14 @@ public class RedpenJenkinsCore {
      * Upload generated artifacts of job in Jira issue as per given configuration in Jenkins Job Configuration.
      * @param issueKey : Jira issue key [TEST-1, TP-2]
      * @param jwtToken : JWT Token
-     * @param frameWork : TestFrameWork
-     * @param frameWorkPath : Updated File Path for selected test framework
+     * @param fileRelativePath : Updated File Path for selected test framework
      * @param basePath : workspace path
      * @param buildTriggerTime : build trigger time
      * @return List of attached file name
      */
-    private List<String> uploadFilesFromSelectedTestFrameWork(String issueKey, String jwtToken, String frameWork, String frameWorkPath, String basePath, Instant buildTriggerTime) throws IOException {
-        List<String> allFiles = new ArrayList<>();
-        Optional<TestFrameWork> availableInList = RedpenJenkinsCore.isAvailableInList(frameWork);
-
-        if (availableInList.isPresent() && availableInList.get().getValue() != null) {
-            String fileRelativePath = !StringUtils.isBlank(frameWorkPath) ? frameWorkPath : availableInList.get().getPath();
-            String fileAbsolutePath = String.format("%s%s", basePath, fileRelativePath);
-
-            List<String> reportFiles = attachLogFiles(buildTriggerTime, PathUtils.getPath(fileAbsolutePath), issueKey, jwtToken, false);
-            allFiles.addAll(reportFiles);
-        }
-
-        return allFiles;
+    private List<String> uploadFilesFromSelectedTestFrameWork(String issueKey, String jwtToken, String fileRelativePath, String basePath, Instant buildTriggerTime) throws IOException {
+        String fileAbsolutePath = String.format("%s%s", basePath, fileRelativePath);
+        return attachLogFiles(buildTriggerTime, PathUtils.getPath(fileAbsolutePath), issueKey, jwtToken, false);
     }
 
     /**

@@ -6,9 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.redpen.RedpenJobProperty;
+import org.jenkinsci.plugins.redpen.RedpenTestFrameworkConfig;
+import org.jenkinsci.plugins.redpen.service.RedpenJenkinsCore;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Data
 @Builder
@@ -25,16 +31,8 @@ public class ParameterModel {
     private String projectName;
     private Instant buildTriggerTime;
     private String buildNumber;
-    private String e2eTestFrameWork;
-    private String unitTestFrameWork;
+    private List<String> paths;
     private String logFileLocation;
-    private String coverageFrameWork;
-    private String unitTestFrameWorkPath;
-    private String e2eTestFrameWorkPath;
-    private String coverageFrameWorkPath;
-    private String userEmail;
-    private String userPassword;
-
 
     public static ParameterModel getParameterModel(String secret, String issueKey, Run build, RedpenJobProperty redpenPluginJobProperties) {
         ParameterModel parameterModel = new ParameterModel();
@@ -48,14 +46,17 @@ public class ParameterModel {
         parameterModel.setProjectName(build.getParent().getName());
         parameterModel.setBuildNumber(build.getSearchUrl());
         parameterModel.setBuildTriggerTime(build.getTime().toInstant());
-        parameterModel.setE2eTestFrameWork(redpenPluginJobProperties.getE2eTestFrameWork());
-        parameterModel.setE2eTestFrameWorkPath(redpenPluginJobProperties.getE2eTestFrameWorkPath());
-        parameterModel.setUnitTestFrameWork(redpenPluginJobProperties.getUnitTestFrameWork());
-        parameterModel.setUnitTestFrameWorkPath(redpenPluginJobProperties.getUnitTestFrameWorkPath());
-        parameterModel.setCoverageFrameWork(redpenPluginJobProperties.getCoverageFrameWork());
-        parameterModel.setCoverageFrameWorkPath(redpenPluginJobProperties.getCoverageFrameWorkPath());
-        parameterModel.setUserEmail(redpenPluginJobProperties.getUserEmail());
-        parameterModel.setUserPassword(redpenPluginJobProperties.getUserPassword().getPlainText());
+        List<String> pathList = new ArrayList<>();
+        for (RedpenTestFrameworkConfig redpenTestFrameworkConfig :
+                redpenPluginJobProperties.getTestFramework()) {
+            Optional<TestFrameWork> availableInList = RedpenJenkinsCore.isAvailableInList(redpenTestFrameworkConfig.getTestFrameWork());
+            if (availableInList.isPresent() && StringUtils.isEmpty(redpenTestFrameworkConfig.getTestFrameWorkPath())) {
+                pathList.add(availableInList.get().getPath());
+            } else {
+                pathList.add(redpenTestFrameworkConfig.getTestFrameWorkPath());
+            }
+        }
+        parameterModel.setPaths(pathList);
         parameterModel.setRootURL(Jenkins.get().getRootUrl());
 
         return parameterModel;

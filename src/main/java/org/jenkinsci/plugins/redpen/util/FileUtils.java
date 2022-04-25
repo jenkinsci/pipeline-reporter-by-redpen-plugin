@@ -7,8 +7,8 @@ import java.util.List;
 public class FileUtils {
     private FileUtils() {}
 
-    public static String getNewFile(String path, String displayName, String result) {
-        return String.format("%s_%s_%s", path, displayName, result);
+    public static String getNewFile(String path, String result, String epochTime) {
+        return String.format("%s_%s_%s", path, result, epochTime);
     }
 
     public static List<File> listFilesForFolder(File folder) {

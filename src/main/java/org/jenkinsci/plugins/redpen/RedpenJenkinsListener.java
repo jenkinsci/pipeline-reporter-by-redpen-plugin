@@ -41,10 +41,10 @@ public class RedpenJenkinsListener extends RunListener<Run> {
                     String issueKey = getIssueKey(build);
 
                     SecretRetriever secretRetriever = new SecretRetriever();
-                    Optional<String> secret = secretRetriever.getSecretFor(redpenPluginJobProperties.getCredentialId());
+                    String secret = secretRetriever.getSecretById(redpenPluginJobProperties.getCredentialId(), build);
 
-                    if (!StringUtils.isBlank(issueKey) && secret.isPresent()) {
-                        ParameterModel param = ParameterModel.getParameterModel(secret.get(), issueKey, build,
+                    if (!StringUtils.isBlank(issueKey) && secret != null) {
+                        ParameterModel param = ParameterModel.getParameterModel(secret, issueKey, build,
                                 redpenPluginJobProperties);
 
                         RedpenJenkinsCore redpenJenkinsCore = new RedpenJenkinsCore();
@@ -60,7 +60,7 @@ public class RedpenJenkinsListener extends RunListener<Run> {
         }
     }
 
-    private String getIssueKey(Run build) throws IOException, InterruptedException {
+    private String getIssueKey(Run<?, ?> build) throws IOException, InterruptedException {
         GithubPrHelper githubPrHelper = new GithubPrHelper();
         String issueKey = githubPrHelper
                 .getIssueKeyFromPR(build.getEnvironment().get(Constants.GIT_BRANCH, Constants.GIT_BRANCH_MAIN));

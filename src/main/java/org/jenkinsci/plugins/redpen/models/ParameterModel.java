@@ -20,7 +20,6 @@ public class ParameterModel {
     private String secret;
     private String issueKey;
     private String logAbsolutePath;
-    private String displayName;
     private String result;
     private String projectName;
     private Instant buildTriggerTime;
@@ -36,17 +35,16 @@ public class ParameterModel {
     private String userPassword;
 
 
-    public static ParameterModel getParameterModel(String secret, String issueKey, Run build, RedpenJobProperty redpenPluginJobProperties) {
+    public static ParameterModel getParameterModel(String secret, String issueKey, Run<?, ?> build, RedpenJobProperty redpenPluginJobProperties) {
         ParameterModel parameterModel = new ParameterModel();
 
         parameterModel.setSecret(secret);
         parameterModel.setIssueKey(issueKey);
         parameterModel.setLogAbsolutePath(build.getLogFile().getAbsolutePath());
         parameterModel.setLogFileLocation(redpenPluginJobProperties.getLogFileLocation());
-        parameterModel.setDisplayName(build.getDisplayName());
         parameterModel.setResult(String.valueOf(build.getResult()));
         parameterModel.setProjectName(build.getParent().getName());
-        parameterModel.setBuildNumber(build.getSearchUrl());
+        parameterModel.setBuildNumber(String.valueOf(build.getNumber()));
         parameterModel.setBuildTriggerTime(build.getTime().toInstant());
         parameterModel.setE2eTestFrameWork(redpenPluginJobProperties.getE2eTestFrameWork());
         parameterModel.setE2eTestFrameWorkPath(redpenPluginJobProperties.getE2eTestFrameWorkPath());

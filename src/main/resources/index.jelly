@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <div>
     Redpen Jenkins plugin is an open-sourced plugin that is used to integrate Jenkins with <a
-        href="https://www.atlassian.com/software/jira" target="_blank">Jira Software</a>. This plugin is
+        href="https://www.atlassian.com/software/jira" target="_blank" rel="noopener noreferrer">Jira Software</a>. This plugin is
     free to use and provides an easy, secure, and reliable way to send build and deployment information from your
     Jenkins server to your Jira Software.
 </div>

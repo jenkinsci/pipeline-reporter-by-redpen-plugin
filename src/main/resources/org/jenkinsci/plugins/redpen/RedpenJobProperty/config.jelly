@@ -1,6 +1,5 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
-    <f:section title="${%redpen.plugin}">
         <f:optionalBlock name="RedpenPlugin" title="${%redpen.plugin}" checked="${instance != null}"
                          field="redpenPlugin">
             <f:description>
@@ -8,7 +7,8 @@
                 <br/>
                 Visit <a
                     href="https://www.redpen.ai/?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
-                    target="_blank">Redpen Jenkins Plugin
+                    target="_blank"
+                    rel="noopener noreferrer">Redpen Jenkins Plugin
             </a> for
                 know more.
             </f:description>
@@ -17,11 +17,13 @@
                 <c:select/>
                 <f:description>
                     Select existing or add new credentials. To add a new credentials, <a target="_blank"
-                                                                                         href="https://app.redpen.ai/auth/signin?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration">
+                                                                                         href="https://app.redpen.ai/auth/signin?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
+                                                                                         rel="noopener noreferrer">
                     Sign in
                 </a> to Redpen and <a
                         href="https://support.redpen.ai/hc/en-us/articles/4613856461581-How-to-generate-new-Jenkins-Credentials-for-Redpen-Jenkins-Plugin?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
-                        target="_blank">generate a Jenkins credentials
+                        target="_blank"
+                        rel="noopener noreferrer">generate a Jenkins credentials
                 </a> for a Jira site connected.
                 </f:description>
             </f:entry>
@@ -35,7 +37,8 @@
                     Add the API token of the Reporter. The API token must be of the Jira user you have added as a
                     reporter above. Refer to know <a
                         href="https://support.redpen.ai/hc/en-us/articles/4629444300173-How-to-generate-Jira-API-token-of-an-Atlassian-user-account?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
-                        target="_blank">how to generate Jira user API token</a>.
+                        target="_blank"
+                        rel="noopener noreferrer">how to generate Jira user API token</a>.
                 </f:description>
             </f:entry>
 
@@ -75,5 +78,4 @@
             </f:entry>
             <hr/>
         </f:optionalBlock>
-    </f:section>
 </j:jelly>

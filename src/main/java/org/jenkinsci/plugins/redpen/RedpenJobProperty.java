@@ -14,6 +14,7 @@ import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
+import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,6 +29,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -136,7 +139,8 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
         public ListBoxModel doFillCredentialIdItems(
                 @QueryParameter String credentialsId) {
             List<CredentialsMatcher> matchers = new ArrayList<>();
-            if (!StringUtils.isEmpty(credentialsId)) {
+            Jenkins.get().checkPermission(Jenkins.MANAGE);
+            if (!StringUtils.isBlank(credentialsId)) {
                 matchers.add(0, CredentialsMatchers.withId(credentialsId));
             }
 
@@ -172,6 +176,34 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
             return doCheckValidator(value);
         }
 
+        public FormValidation doCheckUnitTestFrameWorkPath(@QueryParameter String value){
+                return doCheckTestFrameWorkPath(value);
+        }
+
+        public FormValidation doCheckE2eTestFrameWorkPath(@QueryParameter String value){
+            return doCheckTestFrameWorkPath(value);
+        }
+
+        public FormValidation doCheckCoverageFrameWorkPath(@QueryParameter String value){
+            return doCheckTestFrameWorkPath(value);
+        }
+
+        private FormValidation doCheckTestFrameWorkPath(String value) {
+            String basePath = RedpenJenkinsCore.getCurrentDirPath();
+            if(StringUtils.isBlank(value))  {
+                return FormValidation.ok();
+            }
+            try {
+                File file = new File(basePath, value);
+                if (file.getCanonicalPath().startsWith(basePath)) {
+                    return FormValidation.ok();
+                }
+            } catch (IOException e) {
+                return FormValidation.errorWithMarkup("FilePath is invalid");
+            }
+            return FormValidation.errorWithMarkup("FilePath not allowed");
+        }
+
         private FormValidation doCheckValidator(String value) {
             if (StringUtils.isBlank(value)) {
                 return FormValidation.ok();
@@ -181,6 +213,7 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
 
             if (availableInList.isPresent()) {
                 TestFrameWork testFrameWork = availableInList.get();
+                Jenkins.get().checkPermission(Jenkins.MANAGE);
                 return FormValidation.ok(String.format("Default Path : '%s' ", testFrameWork.getPath()));
             }
 

@@ -54,20 +54,20 @@ public class RedpenService {
      * @param file : File to upload on Jira issue
      * @return Status of attachment uploaded successfully or not. TRUE = uploaded successfully, FALSE = upload fail
      */
-    public boolean addAttachment(String issueKey, String jwtToken, File file) {
+    public boolean addAttachment(String issueKey, String jwtToken, File file, String fileName) {
         try {
             String path = String.format("%s/external/jenkins/issues/%s/attachments", Constants.BASE_PATH, issueKey);
 
             HttpPost post = new HttpPost(path);
 
-            FileBody fileBody = new FileBody(file, ContentType.DEFAULT_BINARY);
+            FileBody fileBody = new FileBody(file, ContentType.DEFAULT_BINARY, fileName);
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
             builder.addPart("file", fileBody);
             HttpEntity entity = builder.build();
 
-            post.addHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
-            post.addHeader("client-id", Constants.CLIENT_ID);
+            post.setHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
+            post.setHeader("client-id", Constants.CLIENT_ID);
 
             post.setEntity(entity);
 
@@ -104,18 +104,18 @@ public class RedpenService {
      * @param issueKey : Jira issue key [TEST-1, TP-2]
      * @param jwtToken : JWT Token
      * @param comment : Comment string
-     * @param attachments : Attachment list
+     * @param uploadedFileNames : Attachment list
      */
-    public void addComment(String issueKey, String jwtToken, String comment, List<String> attachments) {
+    public void addComment(String issueKey, String jwtToken, String comment, List<String> uploadedFileNames) {
         try {
             String path = String.format("%s/external/jenkins/issues/%s/comment", Constants.BASE_PATH, issueKey);
-            String commentBody = getCommentBody(comment, attachments);
+            String commentBody = getCommentBody(comment, uploadedFileNames);
 
             HttpPost request = new HttpPost(path);
 
-            request.addHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
-            request.addHeader("client-id", Constants.CLIENT_ID);
-            request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+            request.setHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
+            request.setHeader("client-id", Constants.CLIENT_ID);
+            request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 
             StringEntity stringEntity = new StringEntity(commentBody);
             request.setEntity(stringEntity);

@@ -8,13 +8,13 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
-import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,6 +25,7 @@ import org.jenkinsci.plugins.redpen.constant.Constants;
 import org.jenkinsci.plugins.redpen.models.TestFrameWork;
 import org.jenkinsci.plugins.redpen.secrets.SecretRetriever;
 import org.jenkinsci.plugins.redpen.service.RedpenJenkinsCore;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -137,10 +138,16 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
         }
 
         public ListBoxModel doFillCredentialIdItems(
-                @QueryParameter String credentialsId) {
+                @QueryParameter String credentialsId, @AncestorInPath Item item) {
+            ListBoxModel listBoxModel = new ListBoxModel();
             List<CredentialsMatcher> matchers = new ArrayList<>();
-            Jenkins.get().checkPermission(Jenkins.MANAGE);
-            if (!StringUtils.isBlank(credentialsId)) {
+
+            if (item == null) { // no context
+                return listBoxModel;
+            }
+            item.checkPermission(Item.CONFIGURE);
+
+            if (!StringUtils.isEmpty(credentialsId)) {
                 matchers.add(0, CredentialsMatchers.withId(credentialsId));
             }
 
@@ -157,23 +164,22 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
                                     matchers.toArray(new CredentialsMatcher[0])),
                             credentials);
 
-            ListBoxModel listBoxModel = new ListBoxModel();
             listBoxModel.add(Constants.NONE_DISPLAY_NAME, "");
             listBoxModel.addAll(options);
 
             return listBoxModel;
         }
 
-        public FormValidation doCheckE2eTestFrameWork(@QueryParameter String value) {
-            return doCheckValidator(value);
+        public FormValidation doCheckE2eTestFrameWork(@QueryParameter String value, @AncestorInPath Item item) {
+            return doCheckValidator(value, item);
         }
 
-        public FormValidation doCheckCoverageFrameWork(@QueryParameter String value) {
-            return doCheckValidator(value);
+        public FormValidation doCheckCoverageFrameWork(@QueryParameter String value, @AncestorInPath Item item) {
+            return doCheckValidator(value, item);
         }
 
-        public FormValidation doCheckUnitTestFrameWork(@QueryParameter String value) {
-            return doCheckValidator(value);
+        public FormValidation doCheckUnitTestFrameWork(@QueryParameter String value, @AncestorInPath Item item) {
+            return doCheckValidator(value, item);
         }
 
         public FormValidation doCheckUnitTestFrameWorkPath(@QueryParameter String value){
@@ -204,7 +210,13 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
             return FormValidation.errorWithMarkup("FilePath not allowed");
         }
 
-        private FormValidation doCheckValidator(String value) {
+        private FormValidation doCheckValidator(String value, @AncestorInPath Item item) {
+
+            if (item == null) { // no context
+                return FormValidation.ok();
+            }
+            item.checkPermission(Item.CONFIGURE);
+
             if (StringUtils.isBlank(value)) {
                 return FormValidation.ok();
             }
@@ -213,7 +225,6 @@ public class RedpenJobProperty extends JobProperty<Job<?, ?>> {
 
             if (availableInList.isPresent()) {
                 TestFrameWork testFrameWork = availableInList.get();
-                Jenkins.get().checkPermission(Jenkins.MANAGE);
                 return FormValidation.ok(String.format("Default Path : '%s' ", testFrameWork.getPath()));
             }
 

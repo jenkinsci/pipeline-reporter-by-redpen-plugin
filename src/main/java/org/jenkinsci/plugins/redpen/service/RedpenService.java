@@ -66,8 +66,8 @@ public class RedpenService {
             builder.addPart("file", fileBody);
             HttpEntity entity = builder.build();
 
-            post.setHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
-            post.setHeader("client-id", Constants.CLIENT_ID);
+            post.addHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
+            post.addHeader("client-id", Constants.CLIENT_ID);
 
             post.setEntity(entity);
 
@@ -113,9 +113,9 @@ public class RedpenService {
 
             HttpPost request = new HttpPost(path);
 
-            request.setHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
-            request.setHeader("client-id", Constants.CLIENT_ID);
-            request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+            request.addHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
+            request.addHeader("client-id", Constants.CLIENT_ID);
+            request.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 
             StringEntity stringEntity = new StringEntity(commentBody);
             request.setEntity(stringEntity);
@@ -138,7 +138,7 @@ public class RedpenService {
             arrayNode.add(a);
         }
         node.put("comment", comment);
-        node.putIfAbsent("attachments", arrayNode);
+        node.put("attachments", arrayNode);
 
         return node.toString();
     }

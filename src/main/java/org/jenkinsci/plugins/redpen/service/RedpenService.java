@@ -115,7 +115,7 @@ public class RedpenService {
 
             request.addHeader(HttpHeaders.AUTHORIZATION, String.format("JWT %s", jwtToken));
             request.addHeader("client-id", Constants.CLIENT_ID);
-            request.addHeader(HttpHeaders.CONTENT_TYPE, String.valueOf(ContentType.APPLICATION_JSON));
+            request.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
 
             StringEntity stringEntity = new StringEntity(commentBody);
             request.setEntity(stringEntity);

@@ -28,6 +28,10 @@ public class Constants {
     public static final String WEB_DRIVER_IO_DISPLAY_NAME = "WebDriverIO";
 
     public static final String REDPEN_PLUGIN = "RedpenPlugin";
+    public static final String UNIT_TEST = "Unit Test";
+    public static final String E2E_TEST = "E2E Test";
+    public static final String COVERAGE_TEST = "Coverage Test";
+
 
     public static final String JENKINS_HOME = "JENKINS_HOME";
     public static final String BASE_PATH = "https://api.redpen.ai";
@@ -39,6 +43,7 @@ public class Constants {
     public static final String JACOCO_PATH = "/target/jacoco.exec";
     public static final String JEST_PATH = "/jest-stare/jest-results.json";
     public static final String WEB_DRIVER_IO_PATH = "/reports/E2E-report.pdf";
+    public static final String WEB_DRIVER_IO_PATH_JSON = "/reports/html-reports/E2E-report.json";
 
     public static final List<TestFrameWork> TEST_FRAME_WORKS = Collections.unmodifiableList(Arrays.asList(TestFrameWork.builder().displayName(WEB_DRIVER_IO_DISPLAY_NAME).path(WEB_DRIVER_IO_PATH).value(WEB_DRIVER_IO).build(), TestFrameWork.builder().displayName(JUNIT_DISPLAY_NAME).path(JUNIT_PATH).value(JUNIT).build(), TestFrameWork.builder().displayName(JACOCO_DISPLAY_NAME).path(JACOCO_PATH).value(JACOCO).build(), TestFrameWork.builder().displayName(NUNIT_DISPLAY_NAME).path(NUNIT_PATH).value(NUNIT).build(), TestFrameWork.builder().displayName(SELENIUM_DISPLAY_NAME).path(SELENIUM_PATH).value(SELENIUM).build(), TestFrameWork.builder().displayName(JEST_DISPLAY_NAME).path(JEST_PATH).value(JEST).build()));
 

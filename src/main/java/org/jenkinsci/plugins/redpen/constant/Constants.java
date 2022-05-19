@@ -28,9 +28,13 @@ public class Constants {
     public static final String WEB_DRIVER_IO_DISPLAY_NAME = "WebDriverIO";
 
     public static final String REDPEN_PLUGIN = "RedpenPlugin";
+    public static final String UNIT_TEST = "Unit Test";
+    public static final String E2E_TEST = "E2E Test";
+    public static final String COVERAGE_TEST = "Coverage Test";
+
 
     public static final String JENKINS_HOME = "JENKINS_HOME";
-    public static final String BASE_PATH = "https://api.dev.redpen.work";
+    public static final String BASE_PATH = "https://api.redpen.ai";
     public static final String CLIENT_ID = "3b0127d0-0607-4d6d-ae92-a96cd3b6c063";
 
     public static final String NUNIT_PATH = "/logs";

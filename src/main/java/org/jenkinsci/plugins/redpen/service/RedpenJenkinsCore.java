@@ -81,15 +81,15 @@ public class RedpenJenkinsCore {
             LOGGER.log(Level.INFO, "File {0} is attached", fileName);
         }
 
-        AttachmentModel unitTestResults = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getUnitTestFrameWork(), parameter.getUnitTestFrameWorkPath(), workspaceBasePath, buildTriggerTime, "Unit Test");
+        AttachmentModel unitTestResults = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getUnitTestFrameWork(), parameter.getUnitTestFrameWorkPath(), workspaceBasePath, buildTriggerTime, Constants.UNIT_TEST);
         uploadedFileNames.addAll(unitTestResults.getAttachments());
         comment.append(unitTestResults.getComment());
 
-        AttachmentModel e2eTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getE2eTestFrameWork(), parameter.getE2eTestFrameWorkPath(), workspaceBasePath, buildTriggerTime, "E2E Test");
+        AttachmentModel e2eTestUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getE2eTestFrameWork(), parameter.getE2eTestFrameWorkPath(), workspaceBasePath, buildTriggerTime, Constants.E2E_TEST);
         uploadedFileNames.addAll(e2eTestUploadedFiles.getAttachments());
         comment.append(e2eTestUploadedFiles.getComment());
 
-        AttachmentModel coverageUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getCoverageFrameWork(), parameter.getCoverageFrameWorkPath(), workspaceBasePath, buildTriggerTime, "Coverage Test");
+        AttachmentModel coverageUploadedFiles = uploadFilesFromSelectedTestFrameWork(issueKey, jwtToken, parameter.getCoverageFrameWork(), parameter.getCoverageFrameWorkPath(), workspaceBasePath, buildTriggerTime, Constants.COVERAGE_TEST);
         uploadedFileNames.addAll(coverageUploadedFiles.getAttachments());
         comment.append(coverageUploadedFiles.getComment());
 
@@ -100,7 +100,7 @@ public class RedpenJenkinsCore {
             File file = new File(workspaceBasePath, trimPath);
             if (!StringUtils.isBlank(trimPath) && file.getCanonicalPath().startsWith(workspaceBasePath)) {
                 String logPath = file.getAbsolutePath();
-                AttachmentModel reportFiles = attachLogFiles(buildTriggerTime, logPath, issueKey, jwtToken, "Other Files", true);
+                AttachmentModel reportFiles = attachLogFiles(buildTriggerTime, workspaceBasePath, logPath, issueKey, jwtToken, "", "Other Files", true);
                 uploadedFileNames.addAll(reportFiles.getAttachments());
                 comment.append(reportFiles.getComment());
             }
@@ -215,7 +215,7 @@ public class RedpenJenkinsCore {
             // Check For Path traversal vulnerability
             File file = new File(basePath, fileRelativePath);
             if (file.getCanonicalPath().startsWith(basePath)) {
-                AttachmentModel reportFiles = attachLogFiles(buildTriggerTime, PathUtils.getPath(file.getAbsolutePath()), issueKey, jwtToken, frameWorkName,false);
+                AttachmentModel reportFiles = attachLogFiles(buildTriggerTime, basePath, PathUtils.getPath(file.getAbsolutePath()), issueKey, jwtToken, frameWork, frameWorkName,false);
                 allFiles.addAll(reportFiles.getAttachments());
                 comment.append(reportFiles.getComment());
             }
@@ -246,7 +246,7 @@ public class RedpenJenkinsCore {
      * @param isMandatory    : If this parameter is true then this method will upload attachment even if file is not generated after build start.
      * @return List of attached file name
      */
-    private AttachmentModel attachLogFiles(Instant buildStartTime, String filePath, String issueKey, String jwtToken, String frameWorkName, Boolean isMandatory) throws IOException {
+    private AttachmentModel attachLogFiles(Instant buildStartTime, String basePath, String filePath, String issueKey, String jwtToken, String frameWork, String frameWorkName, Boolean isMandatory) throws IOException {
         RedpenService redpenService = RedpenService.getRedpenInstance();
         List<String> fileNames = new ArrayList<>();
         AttachmentModel attachmentModel = new AttachmentModel();
@@ -271,7 +271,7 @@ public class RedpenJenkinsCore {
                 if (attachmentUploaded) {
                     fileNames.add(fileName);
                     LOGGER.log(Level.INFO, "File {0} is attached", fileName);
-                    String result = FileReaderUtils.readFile(filePathAbsolute.toString(), frameWorkName);
+                    String result = FileReaderUtils.readFile(filePathAbsolute.toString(), basePath, frameWork, frameWorkName);
                     comment.append(result);
                 }
             }

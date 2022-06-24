@@ -162,7 +162,7 @@ public class RedpenJenkinsCore {
         String result = parameter.getResult();
         Instant buildTriggerTime = parameter.getBuildTriggerTime();
 
-        return String.format("Build [%s|%s] Result {color:red}*%s*{color} Time %s", displayName, jobURL, result, buildTriggerTime);
+        return String.format(" [Build %s|%s] Result {color:red}*%s*{color} Time %s", displayName, jobURL, result, buildTriggerTime);
     }
 
     /**

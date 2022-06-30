@@ -16,17 +16,14 @@
             <f:entry title="Redpen credentials" field="credentialId">
                 <c:select/>
                 <f:description>
-                    Select existing or add new credentials. To add a new credentials, <a target="_blank"
-                                                                                         href="https://app.redpen.ai/auth/signin?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
-                                                                                         rel="noopener noreferrer">
-                    Sign in
-                </a> to Redpen and <a
-                        href="https://support.redpen.ai/hc/en-us/articles/4613856461581-How-to-generate-new-Jenkins-Credentials-for-Redpen-Jenkins-Plugin?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
-                        target="_blank"
-                        rel="noopener noreferrer">generate a Jenkins credentials
-                </a> for a Jira site connected.
+                    Select existing or add new credentials. You can create new credentials from Redpen for Jenkins add-on installed in your Jira site.
                 </f:description>
             </f:entry>
+            <f:advanced title="Reporter" align="right" >
+                <f:description>
+                    Fill the Reporter Email and Reporter API Token to see your service user as reporter in the Jira ticket comments. This is required only if you are not using Redpen - Jira Pipeline Reporter add-on.
+                </f:description>
+
             <f:entry title="Reporter" field="userEmail"
                      description="Add the email of the Jira user that you want to be a reporter of the comments in the Jira tickets. The email address must be a valid Jira user and has access to the Jira site. ">
                 <f:textbox placeholder="Email Address"/>
@@ -41,6 +38,9 @@
                         rel="noopener noreferrer">how to generate Jira user API token</a>.
                 </f:description>
             </f:entry>
+
+            </f:advanced>
+
 
             <f:entry title="Unit test framework" field="unitTestFrameWork">
                 <f:select/>

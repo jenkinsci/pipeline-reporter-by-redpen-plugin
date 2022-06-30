@@ -21,7 +21,7 @@
             </f:entry>
             <f:advanced title="Reporter" align="right" >
                 <f:description>
-                    Fill this in case of you need your own service user as a reporter.
+                    Fill the Reporter Email and Reporter API Token to see your service user as reporter in the Jira ticket comments. This is required only if you are not using Redpen - Jira Pipeline Reporter add-on.
                 </f:description>
 
             <f:entry title="Reporter" field="userEmail"

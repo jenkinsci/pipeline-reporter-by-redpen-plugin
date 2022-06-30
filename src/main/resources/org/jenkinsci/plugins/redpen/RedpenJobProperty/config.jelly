@@ -16,15 +16,7 @@
             <f:entry title="Redpen credentials" field="credentialId">
                 <c:select/>
                 <f:description>
-                    Select existing or add new credentials. To add a new credentials, <a target="_blank"
-                                                                                         href="https://app.redpen.ai/auth/signin?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
-                                                                                         rel="noopener noreferrer">
-                    Sign in
-                </a> to Redpen and <a
-                        href="https://support.redpen.ai/hc/en-us/articles/4613856461581-How-to-generate-new-Jenkins-Credentials-for-Redpen-Jenkins-Plugin?utm_source=jenkins_plugin&amp;utm_medium=application&amp;utm_campaign=integration"
-                        target="_blank"
-                        rel="noopener noreferrer">generate a Jenkins credentials
-                </a> for a Jira site connected.
+                    Select existing or add new credentials. You can create new credentials from Redpen for Jenkins add-on installed in your Jira site.
                 </f:description>
             </f:entry>
             <f:advanced title="Reporter" align="right" >

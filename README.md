@@ -1,8 +1,7 @@
 # Redpen - Pipeline Reporter for Jira
 
 ## Introduction
-
-Redpen Jenkins plugin is an open-sourced plugin that is used to integrate Jenkins with [Jira Software](https://www.atlassian.com/software/jira). This plugin is free to use and provides an easy, secure, and reliable way to send build and deployment information from your Jenkins server to your Jira Software. The pipeline reports the build and deployment status (failure or success) with other meaningful data into the Jira issues which helps your team to track and collaborate on the work.
+Redpen Jenkins plugin is an open-sourced plugin that is used to integrate Jenkins with [Jira Software](https://www.atlassian.com/software/jira). The Redpen Jenkins plugin provides an easy and secure way to send the information of failure build from Jenkins server to your Jira sites. The pipeline reports the failure status of the build and deployment with meaningful data directly into the Jira issues which helps your team to track and collaborate on the work.
 
 ## Benefits
  - This plugin integration gives visibility to your team of the CI/CD pipelines related to Jira issues.
@@ -11,16 +10,15 @@ Redpen Jenkins plugin is an open-sourced plugin that is used to integrate Jenkin
 
  - The plugin eliminates the manual work required by **Software Engineers** to update the Jira issues with the pipeline details.
  
- - The plugin provides visibility to **Product Managers, Team Leads,** and **QA Engineers** into the pipeline like failing or passing builds, tests, and deployments.
+ - The plugin provides visibility to **Product Managers**, **Team Leads**, and **QA Engineers** into the pipeline like failing builds, tests, and deployments.
 
 ## How to get started
 There are four steps to get started with the integration:
 
-1. Install Redpen Jenkins Plugin
-
-2. Generate a new Jenkins Credentials 
-3. Generate Jira API token of an Atlassian user account 
-4. Configure Redpen Jenkins Plugin into a Jenkins Job
+1. Install Redpen for Jenkins add-on from Jira Marketplace.
+2. Generate a new Jenkins Credentials from Jira.
+3. Install Redpen Jenkins Plugin from Plugin manager.
+4. Configure Redpen Jenkins Plugin into a Jenkins job.
 
 [Click here](https://support.redpen.ai/hc/en-us/articles/4727856045069) and follow the steps to integrate and configure the plugin.
 
